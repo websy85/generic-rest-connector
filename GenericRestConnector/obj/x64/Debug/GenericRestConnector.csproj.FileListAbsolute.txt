@@ -1,0 +1,16 @@
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Debug\GenericRestConnector.exe.config
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Debug\GenericRestConnector.exe
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Debug\GenericRestConnector.pdb
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Debug\Newtonsoft.Json.dll
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Debug\QvxLibrary.dll
+C:\GenericRestConnector\GenericRestConnector.exe.config
+C:\GenericRestConnector\GenericRestConnector.exe
+C:\GenericRestConnector\GenericRestConnector.pdb
+C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.exe.config
+C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.exe
+C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.pdb
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Debug\GenericRestConnector.Properties.Resources.resources
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Debug\GenericRestConnector.csproj.GenerateResource.Cache
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Debug\GenericRestConnector.exe
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Debug\GenericRestConnector.pdb
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Debug\GenericRestConnector.csprojResolveAssemblyReference.cache

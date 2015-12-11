@@ -1,0 +1,16 @@
+﻿<div>
+    <div ng-show="!$parent.tokenRequested">
+        <h2>Please enter your Client Id and Secret for the connection and Authorize</h2>
+        <label>Client Id: </label>
+        <input ng-model="$parent.key" />
+        <label>Client Secret: </label>
+        <input type="password" ng-model="$parent.secret" />
+        <button qva-activate="$parent.authorize()">Authorize</button>
+    </div>
+    <div ng-show="$parent.tokenRequested">
+        <h2>Please enter the Access Token provided</h2>
+        <label>Access Token: </label>
+        <input ng-model="$parent.password" />
+    </div>
+</div>
+

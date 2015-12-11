@@ -1,0 +1,7 @@
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\generic_rest_connector.Properties.Resources.resources
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\generic-rest-connector.csproj.GenerateResource.Cache
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\generic-rest-connector.exe
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\generic-rest-connector.pdb
+C:\Program Files\Common Files\Qlik\Custom Data\generic-rest-connector\generic-rest-connector.exe.config
+C:\Program Files\Common Files\Qlik\Custom Data\generic-rest-connector\generic-rest-connector.exe
+C:\Program Files\Common Files\Qlik\Custom Data\generic-rest-connector\generic-rest-connector.pdb

@@ -1,0 +1,39 @@
+﻿<div class="qrest-connect-dialog-container qui-modalbackground">
+    <div class=" card qrest-connect-dialog body qui-delayedModal">
+        <div class="select-config-dialog">
+            <h1>Choose a REST Configuration</h1>
+            <ul class="select-config-source dictionary-nav">
+                <li class="nav-button card active">Online</li>
+                <li class="nav-button card">Local</li>
+            </ul>
+            <div class="select-config" ng-show="step=='config-selection'">
+                <ul>
+                    <li ng-repeat="dic in onlineDictionaryList" qva-activate="loadTemplate('connection-settings', '{{dic._id}}', 'online')" data-next-step="connection-settings">
+                        <div class="card dictionary">
+                            <a href="/general/#{dic._id}" class="title">{{dic.display_name}}</a>
+                            <a class="sub-title">{{dic.owner}}</a>
+                            <div class="icon">
+                                <img src="{{dic.icon}}" />
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="connection-settings" ng-show=" step=='connection-settings' ">
+                <label>Connection Name: </label>
+                <input ng-model="name" placeholder="Connection Name" />
+                <label>Connection Url: </label>
+                <input ng-model="url" data-parameter="url" placeholder="Url" />
+                <div ng-include src="subpage">
+                    <ng-include/>
+                </div>
+            </div>
+            <footer class="dm-footer">
+                <qui-button class="qui-button" qva-activate="$event.preventDefault(); onCancelClicked()" q-translation="Common.Cancel"></qui-button>
+                <qui-button class="qui-button" qva-activate="$event.preventDefault(); onOKClicked()" q-translation="Common.Save">
+                    Save
+                </qui-button>
+            </footer>
+        </div>
+    </div>
+</div>

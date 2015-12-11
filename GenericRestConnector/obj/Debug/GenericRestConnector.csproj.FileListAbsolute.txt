@@ -1,0 +1,18 @@
+C:\Program Files\Common Files\Qlik\Custom Data\generic-rest-connector\generic-rest-connector.exe.config
+C:\Program Files\Common Files\Qlik\Custom Data\generic-rest-connector\generic-rest-connector.exe
+C:\Program Files\Common Files\Qlik\Custom Data\generic-rest-connector\generic-rest-connector.pdb
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\generic_rest_connector.Properties.Resources.resources
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\GenericRestConnector.csproj.GenerateResource.Cache
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\generic-rest-connector.exe
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\generic-rest-connector.pdb
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\GenericRestConnector.exe
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\GenericRestConnector.pdb
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\generic-rest-connector\obj\Debug\GenericRestConnector.Properties.Resources.resources
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\Debug\GenericRestConnector.csprojResolveAssemblyReference.cache
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\Debug\GenericRestConnector.Properties.Resources.resources
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\Debug\GenericRestConnector.csproj.GenerateResource.Cache
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\Debug\GenericRestConnector.exe
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\Debug\GenericRestConnector.pdb
+C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.exe.config
+C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.exe
+C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.pdb
