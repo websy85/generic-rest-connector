@@ -32,18 +32,25 @@ namespace GenericRestConnector
         {
             client = new WebClient();
 
+            //During a reload the Dictionary JSON is loaded from GitHub. This helps to reduce traffic to the Heroku Dyno 
+            WebClient gitClient = new WebClient();
+            gitClient = AddHeaders(gitClient);
+            //use the token from the config file to authorize the GitHub Request
+            String gitToken = ConfigurationManager.AppSettings["githubtoken"];
+            gitClient.Headers.Add(HttpRequestHeader.Authorization, "token " + gitToken);
+
             String UserName;
             String Password;
-            String dictId;
+            String dictionaryUrl;
 
             //IsMore should start as false and will be re evaluated in the GetJson routine
-            IsMore = false;
+            IsMore = true;
 
             //Use MParameters to set extra parameters
             MParameters.TryGetValue("username", out UserName);
             MParameters.TryGetValue("password", out Password);
             MParameters.TryGetValue("url", out UrlBase);
-            MParameters.TryGetValue("dictionary", out dictId);
+            MParameters.TryGetValue("dictionaryurl", out dictionaryUrl);
 
             authInfo.User = UserName;
             authInfo.Password = Password;
@@ -54,19 +61,22 @@ namespace GenericRestConnector
             pageInfo.CurrentPage = 1;
             pageInfo.LoadLimit = 1000000;
             
-            String dictionaryUrl = ConfigurationManager.AppSettings["PublicDictionaryHost"];
             if (String.IsNullOrEmpty(dictionaryUrl))
             {
                 Dictionary = null;
             }
-            dictionaryUrl += "/api/public/dictionary/";
-            dictionaryUrl += dictId;
-            String dictionary = client.DownloadString(dictionaryUrl);
+            
+            String dictionary = gitClient.DownloadString(dictionaryUrl);
             if (!String.IsNullOrEmpty(dictionary))
             {
+                
                 Dictionary = JsonConvert.DeserializeObject(dictionary);
+                Dictionary = Dictionary.content.ToString();
+                Dictionary = Convert.FromBase64String(Dictionary);
+                Dictionary = Encoding.UTF8.GetString(Dictionary);
+                Dictionary = JsonConvert.DeserializeObject(Dictionary);
                 authentication = new Authentication(Dictionary.auth_method.ToString(), authInfo, Dictionary.auth_options);
-                pager = new Pager(Dictionary.paging_method.ToString(), pageInfo);
+                pager = new Pager(Dictionary.paging_method.ToString(), Dictionary.paging_options);
             }
         }
 
@@ -101,16 +111,21 @@ namespace GenericRestConnector
             }
         }
 
-        public dynamic GetJson()
+        public void Prep()
         {
             //add the headers to the web client
             client = AddHeaders(client);
             //prep the WebClient with any authentication steps
             client = authentication.PrepClient(client);
             //build the initial url
-            ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint, ActiveTable.endpoint.ToString());
+            ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint, ActiveTable.endpoint.ToString(), pageInfo);
             //add any authentication url stuff
             ActiveUrl = authentication.PrepUrl(ActiveUrl);
+        }
+
+        public dynamic GetJSON()
+        {
+            IsMore = false;
             try
             {
                 ActiveResults = JsonConvert.DeserializeObject(client.DownloadString(ActiveUrl));
@@ -122,6 +137,21 @@ namespace GenericRestConnector
                 QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Error, "Downloading Web Response - " + ex.Status + ": " + ex.Message);
             }
             return null;
+        }
+
+        public void Page()
+        {
+            ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint, ActiveTable.endpoint.ToString(), pageInfo);
+            //add any authentication url stuff
+            ActiveUrl = authentication.PrepUrl(ActiveUrl);
+            if(String.IsNullOrEmpty(ActiveUrl))
+            {
+                IsMore = false;
+            }
+            else
+            {
+                IsMore = true;
+            }
         }
 
         public QvxField[] createFieldList(String tableName, String fields)

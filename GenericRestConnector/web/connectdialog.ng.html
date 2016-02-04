@@ -8,7 +8,7 @@
             </ul>
             <div class="select-config" ng-show="step=='config-selection'">
                 <ul>
-                    <li ng-repeat="dic in onlineDictionaryList" qva-activate="loadTemplate('connection-settings', '{{dic._id}}', 'online')" data-next-step="connection-settings">
+                    <li ng-repeat="dic in onlineDictionaryList" qva-activate="loadTemplate('connection-settings', '{{dic._id}}', '{{dic.dictionary_url}}','online')" data-next-step="connection-settings">
                         <div class="card dictionary">
                             <a href="/general/#{dic._id}" class="title">{{dic.display_name}}</a>
                             <a class="sub-title">{{dic.owner}}</a>

@@ -33,33 +33,33 @@ namespace GenericRestConnector
 
             //Get a reference to the QvxTable from MTables
             QvxTable qTable = FindTable(liveTable, MTables);
+            helper.Prep();
 
-            data = helper.GetJson();
+            while (helper.IsMore)
+            {
+                data = helper.GetJSON();
 
-            if (helper.DataElement != null)
-            {
-                data = data[helper.DataElement];
+                if (helper.DataElement != null)
+                {
+                    data = data[helper.DataElement];
+                }
+                helper.pageInfo.CurrentPageSize = data.Count;
+                helper.pageInfo.CurrentPage++;
+                foreach (dynamic row in data)
+                {
+                    if (recordsLoaded < helper.pageInfo.LoadLimit)
+                    {
+                        yield return InsertRow(row, qTable);
+                    }
+                    else
+                    {
+                        helper.IsMore = false;
+                        break;
+                    }
+                }
+                helper.pageInfo.CurrentRecord = recordsLoaded;
+                helper.Page();
             }
-            foreach (dynamic row in data)
-            {
-                yield return InsertRow(row, qTable);
-            }
-            //while (helper.IsMore && recordsLoaded < helper.LoadLimit)
-            //{
-            //    data = helper.GetNext();
-            //    foreach (dynamic row in data[helper.DataElement])
-            //    {
-            //        if (recordsLoaded < helper.LoadLimit)
-            //        {
-            //            yield return InsertRow(row, qTable);
-            //        }
-            //        else
-            //        {
-            //            helper.IsMore = false;
-            //            break;
-            //        }
-            //    }
-            //}
         }
 
         private QvxDataRow InsertRow(dynamic sourceRow, QvxTable tableDef)

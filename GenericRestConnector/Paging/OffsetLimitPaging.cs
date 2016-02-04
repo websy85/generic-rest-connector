@@ -8,11 +8,11 @@ namespace GenericRestConnector
 {
     public class OffsetLimitPaging:PagingBase
     {
-        public override string PrepUrl(String url, dynamic options, PageInfo info)
+        public override string PrepUrl(String url, dynamic options, PageInfo pageInfo)
         {
-            if (options.offsetParameter == null || options.offsetParameter == "")
+            if (options.offset_url_parameter == null || options.offset_url_parameter == "")
             {
-                url += "/0/" + options.batch_size;
+                url += String.Format("/{0}/{1}", pageInfo.CurrentRecord, options.batch_size);
             }
             else
             {
@@ -24,7 +24,7 @@ namespace GenericRestConnector
                 {
                     url += "?";
                 }
-                url += String.Format("{0}={1}&{2}={3}",options.offsetParameter, info.CurrentRecord, options.limitParameter, options.batch_size);
+                url += String.Format("{0}={1}&{2}={3}", options.offset_url_parameter, pageInfo.CurrentRecord, options.limit_url_parameter, options.batch_size);
             }
             return url;
         }

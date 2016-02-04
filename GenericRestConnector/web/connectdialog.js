@@ -18,12 +18,13 @@
                     "API Key": "/customdata/GenericRestConnector/apiKey.ng.html"
                 };
                 $scope.name;
-                $scope.username;
-                $scope.password;
+                $scope.username = "A";
+                $scope.password = "V";
                 $scope.key;
                 $scope.secret;
                 $scope.tokenRequested = false;
                 $scope.url;
+                $scope.dicurl;
                 $scope.config;
                 $scope.provider = "GenericRestConnector.exe";
                 $scope.subpage = $scope.connectionTemplates["None"];
@@ -59,6 +60,8 @@
                 $('[data-parameter]').each(function (index, item) {
                     conn += $(item).attr("data-parameter") + "=" + $(item).val() + ";";
                 });
+                
+                conn += "dictionaryurl="+$scope.dicurl+";";
                 conn += "\"";
                 console.log(conn);
                 return conn;
@@ -96,9 +99,10 @@
             };
 
             //load and display the required template based on the config auth setting
-            $scope.loadTemplate = function (step, id, source) {
+            $scope.loadTemplate = function (step, id, dicurl, source) {
                 this.nextStep(step);
                 $scope.dictionaryId = id;
+                $scope.dicurl = dicurl;
                 $scope.source = source;
                 input.serverside.sendJsonRequest("getDictionaryAuth", id).then(function (response) {
                     $scope.subpage = $scope.connectionTemplates[response.qMessage];
