@@ -1,16 +1,20 @@
 ﻿<div>
-    <div ng-show="!$parent.tokenRequested">
-        <h2>Please enter your Client Id and Secret for the connection and Authorize</h2>
-        <label>Client Id: </label>
-        <input ng-model="$parent.key" />
-        <label>Client Secret: </label>
-        <input type="password" ng-model="$parent.secret" />
-        <button qva-activate="$parent.authorize()">Authorize</button>
+    <div ng-if="dictionaryDef.auth_options.auth_version=='1.0'">
+        <h2>Please enter your Consumer Key and Secret for the connection and Authorize</h2>
+        <input data-parameter="username" ng-model="$parent.username" placeholder="Consumer Key" />
+        <input type="password" ng-model="$parent.consumer_secret" data-parameter="consumer_secret" placeholder="Consumer Secret" />
+        <p class="hint">If you already have your token and token secret you don't need to authorize, simply enter them below</p>
+        <a target="_blank" href="{{dictionaryDef.factory_oauth_authorize_url}}/{{dictionaryId}}?consumer_key={{$parent.username}}&consumer_secret={{$parent.consumer_secret}}" class="qui-button qrest-authorize">Authorize</a>
+        <h2>Then enter your Token and Token Secret</h2>
+        <input type="password" ng-model="$parent.token" data-parameter="token" placeholder="Token" />
+        <input type="password" ng-model="$parent.password" data-parameter="password" placeholder="Token Secret" />
     </div>
-    <div ng-show="$parent.tokenRequested">
-        <h2>Please enter the Access Token provided</h2>
-        <label>Access Token: </label>
-        <input ng-model="$parent.password" />
+    <div ng-if="dictionaryDef.auth_options.auth_version=='2.0'">
+        <h2>Please enter your Client Id and Secret for the connection and Authorize</h2>
+        <input ng-model="$parent.key" placeholder="Client Id" />
+        <p class="hint">If you already have your access token you don't need to authorize, simply enter it below</p>
+        <a target="_blank" href="{{dictionaryDef.factory_oauth_authorize_url}}/{{dictionaryId}}?clientid={{$parent.key}}" class="qui-button qrest-authorize">Authorize</a>
+        <h2>Then enter your Refresh or Access Token</h2>
+        <input type="password" ng-model="$parent.password" data-parameter="password" placeholder="Refresh or Access Token" />
     </div>
 </div>
-

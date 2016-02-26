@@ -30,6 +30,7 @@ namespace GenericRestConnector
         
         public RESTHelper(Dictionary<String, String> MParameters)
         {
+            QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Setting up REST Helper");
             client = new WebClient();
 
             //During a reload the Dictionary JSON is loaded from GitHub. This helps to reduce traffic to the Heroku Dyno 
@@ -42,6 +43,8 @@ namespace GenericRestConnector
             String UserName;
             String Password;
             String dictionaryUrl;
+            String Token;
+            String consumerSecret;
 
             //IsMore should start as false and will be re evaluated in the GetJson routine
             IsMore = true;
@@ -49,13 +52,18 @@ namespace GenericRestConnector
             //Use MParameters to set extra parameters
             MParameters.TryGetValue("username", out UserName);
             MParameters.TryGetValue("password", out Password);
+            MParameters.TryGetValue("token", out Token);
+            MParameters.TryGetValue("consumer_secret", out consumerSecret);
             MParameters.TryGetValue("url", out UrlBase);
             MParameters.TryGetValue("dictionaryurl", out dictionaryUrl);
 
             authInfo.User = UserName;
             authInfo.Password = Password;
-            authInfo.Token = Password;
+            authInfo.oauth2Token = Password;
             authInfo.APIKey = Password;
+            authInfo.ConsumerSecret = consumerSecret;
+            authInfo.oauth1Token = Token;
+            authInfo.oauth1Secret = Password;
 
             pageInfo.CurrentRecord = 0;
             pageInfo.CurrentPage = 1;
@@ -75,7 +83,12 @@ namespace GenericRestConnector
                 Dictionary = Convert.FromBase64String(Dictionary);
                 Dictionary = Encoding.UTF8.GetString(Dictionary);
                 Dictionary = JsonConvert.DeserializeObject(Dictionary);
-                authentication = new Authentication(Dictionary.auth_method.ToString(), authInfo, Dictionary.auth_options);
+                String authMethod = Dictionary.auth_method.ToString();
+                if (authMethod == "OAuth" && Dictionary.auth_options.auth_version.ToString() == "1.0")
+                {
+                    authMethod = "OAuth1.0";
+                }
+                authentication = new Authentication(authMethod, authInfo, Dictionary.auth_options);
                 pager = new Pager(Dictionary.paging_method.ToString(), Dictionary.paging_options);
             }
         }
@@ -113,18 +126,23 @@ namespace GenericRestConnector
 
         public void Prep()
         {
+            IsMore = true;
+            pageInfo.CurrentRecord = 0;
+            pageInfo.CurrentPageSize = null;
             //add the headers to the web client
             client = AddHeaders(client);
-            //prep the WebClient with any authentication steps
-            client = authentication.PrepClient(client);
             //build the initial url
-            ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint, ActiveTable.endpoint.ToString(), pageInfo);
+            ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint.ToString(), ActiveTable.endpoint.ToString(), pageInfo);
             //add any authentication url stuff
             ActiveUrl = authentication.PrepUrl(ActiveUrl);
+            //prep the WebClient with any authentication steps. we perform this last in case we're authenticating with oAuth 1.0a
+            authInfo.Url = ActiveUrl;
+            client = authentication.PrepClient(client, authInfo);
         }
 
         public dynamic GetJSON()
         {
+            QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Debug, "Getting JSON");
             IsMore = false;
             try
             {
@@ -141,7 +159,7 @@ namespace GenericRestConnector
 
         public void Page()
         {
-            ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint, ActiveTable.endpoint.ToString(), pageInfo);
+            ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint.ToString(), ActiveTable.endpoint.ToString(), pageInfo);
             //add any authentication url stuff
             ActiveUrl = authentication.PrepUrl(ActiveUrl);
             if(String.IsNullOrEmpty(ActiveUrl))
@@ -218,6 +236,7 @@ namespace GenericRestConnector
 
         private WebClient AddHeaders(WebClient wc)
         {
+            wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
             wc.Headers[HttpRequestHeader.Accept] = "application/json";
             wc.Headers[HttpRequestHeader.UserAgent] = "generic-rest-connector";
             return wc;

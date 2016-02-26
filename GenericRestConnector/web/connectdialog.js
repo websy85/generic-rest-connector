@@ -4,6 +4,8 @@
         controller: ['$scope', 'input', function ($scope, input) {
             function init() {
                 $scope.isEdit = input.editMode;
+                $scope.isLoading = true;
+                $scope.subpageLoading = true;
                 $scope.id = input.instanceId;
                 $scope.connectionParameters = {};
                 $scope.localDictionaryList = [];
@@ -18,8 +20,10 @@
                     "API Key": "/customdata/GenericRestConnector/apiKey.ng.html"
                 };
                 $scope.name;
-                $scope.username = "A";
-                $scope.password = "V";
+                $scope.username;
+                $scope.password;
+                $scope.token;
+                $scope.consumer_secret;
                 $scope.key;
                 $scope.secret;
                 $scope.tokenRequested = false;
@@ -51,6 +55,7 @@
                 //get config list
                 input.serverside.sendJsonRequest("getOnlineDictionaries").then(function (response) {
                     $scope.onlineDictionaryList = JSON.parse(response.qMessage).configs;
+                    $scope.isLoading = false;
                 });
             }
 
@@ -58,7 +63,12 @@
             function buildConnectionString() {
                 var conn = "CUSTOM CONNECT TO \"provider=GenericRestConnector.exe;dictionary=" + $scope.dictionaryId + ";source=" + $scope.source + ";";
                 $('[data-parameter]').each(function (index, item) {
-                    conn += $(item).attr("data-parameter") + "=" + $(item).val() + ";";
+                    if ($(item).attr("data-parameter") == "password") {
+                        $scope.password = $(item).val();
+                    }
+                    else {
+                        conn += $(item).attr("data-parameter") + "=" + $(item).val() + ";";
+                    }
                 });
                 
                 conn += "dictionaryurl="+$scope.dicurl+";";
@@ -87,8 +97,9 @@
 
             //authorize an oAuth connection
             $scope.authorize = function () {
-                input.serverside.sendJsonRequest("getOAuthAuthorizationUrl", $scope.key, $scope.dictionaryId).then(function (response) {
+                input.serverside.sendJsonRequest("getOAuthAuthorizationUrl", $scope.key, $scope.dictionaryId, $scope.dictionaryDef).then(function (response) {
                     $scope.tokenRequested = true;
+                    console.log(JSON.parse(response.qMessage));
                     window.open(response.qMessage, "_blank");
                 });
             };
@@ -104,8 +115,10 @@
                 $scope.dictionaryId = id;
                 $scope.dicurl = dicurl;
                 $scope.source = source;
-                input.serverside.sendJsonRequest("getDictionaryAuth", id).then(function (response) {
-                    $scope.subpage = $scope.connectionTemplates[response.qMessage];
+                input.serverside.sendJsonRequest("getDictionaryDef", id).then(function (response) {
+                    $scope.dictionaryDef = JSON.parse(response.qMessage);
+                    $scope.subpage = $scope.connectionTemplates[$scope.dictionaryDef.auth_method];
+                    $scope.subpageLoading = false;
                 });
             }
 

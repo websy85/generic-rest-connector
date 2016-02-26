@@ -9,25 +9,31 @@ using System.Dynamic;
 using System.Net;
 using System.Configuration;
 using System.Text.RegularExpressions;
+using System.Runtime.Caching;
 
 namespace GenericRestConnector
 {
-    class Connection : QvxConnection
+    public class Connection : QvxConnection
     {
         RESTHelper helper;
         Int64 recordsLoaded;
-        String liveTable;        
+        String liveTable;
+        public String session;
+        private static MemoryCache grcCache = MemoryCache.Default;
+
         public override void Init()
         {
+            //Debugger.Launch();     
             if (helper == null && MParameters != null)
             {
+                Debugger.Launch();               
                 helper = new RESTHelper(MParameters);
             }
         }
 
         private IEnumerable<QvxDataRow> GetData()
         {
-            Debugger.Launch();
+            //Debugger.Launch();
             dynamic data;
             recordsLoaded = 0;
 
@@ -39,7 +45,7 @@ namespace GenericRestConnector
             {
                 data = helper.GetJSON();
 
-                if (helper.DataElement != null)
+                if (!String.IsNullOrEmpty(helper.DataElement))
                 {
                     data = data[helper.DataElement];
                 }
@@ -113,6 +119,8 @@ namespace GenericRestConnector
                     return value.ToString();
                 case "Boolean":
                     return Boolean.Parse(value.ToString());
+                case "Integer":
+                    return Int32.Parse(value.ToString());
                 default:
                     return value.ToString();
             }
@@ -120,6 +128,7 @@ namespace GenericRestConnector
 
         public override QvxDataTable ExtractQuery(string query, List<QvxTable> qvxTables)
         {
+            QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Extracting Query");
             //Debugger.Launch();
             //NOTE: Where clause not yet supported
             String fields = "";
@@ -147,12 +156,16 @@ namespace GenericRestConnector
             {
                 QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Error, ex.Message);
             }
-            helper.SetActiveTable(liveTable);
-            //Create QvxTable based on fields in Select statement
-            MTables = new List<QvxTable>();
-            QvxTable qT = new QvxTable { TableName = liveTable, Fields = helper.createFieldList(liveTable, fields), GetRows = GetData };
-            MTables.Add(qT);
-            return new QvxDataTable(qT);
+            if (!String.IsNullOrEmpty(liveTable) && helper!=null)
+            {
+                helper.SetActiveTable(liveTable);
+                //Create QvxTable based on fields in Select statement
+                MTables = new List<QvxTable>();
+                QvxTable qT = new QvxTable { TableName = liveTable, Fields = helper.createFieldList(liveTable, fields), GetRows = GetData };
+                MTables.Add(qT);
+                return new QvxDataTable(qT);
+            }
+            return null;
 
             //return table
         }

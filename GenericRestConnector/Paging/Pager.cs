@@ -30,7 +30,7 @@ namespace GenericRestConnector
             }
         }
 
-        public String PrepUrl(String baseUrl, dynamic baseEndpoint, String table, PageInfo pageInfo)
+        public String PrepUrl(String baseUrl, String baseEndpoint, String table, PageInfo pageInfo)
         {
             //we'll do some generic checks to see if we should be loading data
             //is the current record >= loadlimit
@@ -39,20 +39,31 @@ namespace GenericRestConnector
                 return null;
             }
             //is the current page size/length zero
-            if (pageInfo.CurrentPageSize == 0)
+            if (pageInfo.CurrentPageSize != null && pageInfo.CurrentPageSize == 0)
             {
                 return null;
             }
             String url;
-            if (baseEndpoint!=null)
+            if (!String.IsNullOrEmpty(baseEndpoint))
             {
-                url = String.Format("{0}/{1}/{2}", baseUrl, baseEndpoint.ToString(),  table);
+                url = String.Format("{0}/{1}/{2}", baseUrl, baseEndpoint,  table);
             }
             else
             {
                 url = String.Format("{0}/{1}", baseUrl, table);
             }
-            url = Page.PrepUrl(url, pagingOptions, pageInfo);
+            if (Page != null)
+            {
+                url = Page.PrepUrl(url, pagingOptions, pageInfo);
+            }
+            else
+            {
+                if (pageInfo.CurrentRecord > 0)
+                {
+                    return null;
+                }
+            }
+            
             return url;
         }
     }

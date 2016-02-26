@@ -11,7 +11,7 @@ namespace GenericRestConnector
     {
         public override System.Net.WebClient PrepClient(System.Net.WebClient client, AuthInfo info, dynamic options)
         {
-            client.Headers[HttpRequestHeader.Authorization] = string.Format("Bearer {0}", info.Token);
+            client.Headers[HttpRequestHeader.Authorization] = string.Format("Bearer {0}", info.oauth2Token);
             return client;
         }
 

@@ -15,6 +15,7 @@ namespace GenericRestConnector
     class Server : QvxServer
     {
         dynamic currentDictionary;
+        String session;
         ErrorHelper errorHelper = new ErrorHelper();
         public override QvxConnection CreateConnection()
         {
@@ -59,17 +60,27 @@ namespace GenericRestConnector
             
         }
 
-        public QvDataContractResponse getDictionaryAuth(String id, QvxConnection connection)
+        public QvDataContractResponse getDictionaryDef(String id, QvxConnection connection)
         {
             //Debugger.Launch();
-
             String dictionary = getDictionary(id, connection);
+            
             if (!String.IsNullOrEmpty(dictionary))
             {
                 dynamic dic = JsonConvert.DeserializeObject(dictionary);
+                String factory_oauth_authorize_url;
+                if (dic.auth_options.auth_version!=null && dic.auth_options.auth_version.ToString() == "1.0")
+                {
+                    factory_oauth_authorize_url = ConfigurationManager.AppSettings["FactoryOAuth1AuthorizeUrl"];
+                }
+                else
+                {
+                    factory_oauth_authorize_url = ConfigurationManager.AppSettings["FactoryOAuthAuthorizeUrl"];
+                }
+                dic.factory_oauth_authorize_url = factory_oauth_authorize_url;
                 return new Info
                 {
-                    qMessage = dic.auth_method
+                    qMessage = JsonConvert.SerializeObject(dic)
                 };
             }
             else
@@ -81,19 +92,22 @@ namespace GenericRestConnector
             }
         }
 
-        public QvDataContractDatabaseListResponse getDatabases()
+        public QvDataContractResponse getDatabases(String id, QvxConnection connection)
         {
-            return new QvDataContractDatabaseListResponse
+            currentDictionary = getDictionary(id, connection);
+            String response = "{\"qDatabases\":[{\"qName\": \"Not Applicable\"}]";
+            response += ", \"dictionary\":" + currentDictionary + "}";
+            return new Info
             {
-                qDatabases = new Database[] 
-                { 
-                    new Database {qName = "Not Applicable"}
-                }
+                qMessage = response
             };
+            
         }
 
         public string getDictionary(string id, QvxConnection connection)
         {
+            QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Getting dictionary");
+            QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, DateTime.Now.ToLongTimeString());
             var d = "";
             connection.MParameters.TryGetValue("fulldictionary", out d);
             if (String.IsNullOrEmpty(d))
@@ -113,7 +127,9 @@ namespace GenericRestConnector
                 String dictionary = client.DownloadString(dictionaryUrl);
                 if (!String.IsNullOrEmpty(dictionary))
                 {
-                    connection.MParameters["fulldictionary"] = dictionary;
+                //    connection.MParameters["fulldictionary"] = dictionary;
+                    QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Got dictionary");
+                    QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, DateTime.Now.ToLongTimeString());
                     return dictionary;
                 }
             }
@@ -182,56 +198,59 @@ namespace GenericRestConnector
         {
             String redirectUrl = ConfigurationManager.AppSettings["OAuthRedirectUri"];
             String authorizeUrl = currentDictionary.auth_options.oauth_authorize_url.ToString();
+            
+            string connector_auth_url = String.Format("{0}/{1}",ConfigurationManager.AppSettings["PublicDictionaryHost"], "auth/oauth2_authorize");
+            string authorize_url = String.Format("{0}?client_id={1}&redirect_uri={2}", authorizeUrl , key, redirectUrl);
+            string response = String.Format("{0}\"connector_auth_url\":\"{1}\",\"authorize_url\":\"{2}\"{3}", "{",connector_auth_url, authorize_url,"}");
             return new Info
             {
-                qMessage = String.Format("{0}?client_id={1}&redirect_uri={2}", authorizeUrl , key, redirectUrl)
+                qMessage = response
             };
         }
 
         public override string HandleJsonRequest(string method, string[] userParameters, QvxConnection connection)
         {
+            connection = (Connection)connection;
             //Debugger.Launch();
             QvDataContractResponse response;
+
+            QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "VariableStore Session is - " + VariableStore.getSession());
             string provider, url, username, password, dictionary, tempdic;
             connection.MParameters.TryGetValue("provider", out provider);
             connection.MParameters.TryGetValue("userid", out username);
             connection.MParameters.TryGetValue("password", out password);
             connection.MParameters.TryGetValue("url", out url);
             connection.MParameters.TryGetValue("dictionary", out dictionary);
-            connection.MParameters.TryGetValue("fulldictionary", out tempdic);
-
-            if (currentDictionary == null && String.IsNullOrEmpty(tempdic) && dictionary != null)
-            {
-                currentDictionary = JsonConvert.DeserializeObject(getDictionary(dictionary, connection));
-            }
-            else if(currentDictionary == null && !String.IsNullOrEmpty(tempdic))
-            {
-                currentDictionary = JsonConvert.DeserializeObject(tempdic);
-            }
 
             switch (method)
             {
                 case "getOnlineDictionaries":
+                    QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "getting dictionaries");
+                    QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, DateTime.Now.ToLongTimeString());
                     response = getOnlineDictionaries();
+                    QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "got dictionaries");
+                    QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, DateTime.Now.ToLongTimeString());
                     break;
-                case "getDictionaryAuth":
-                    response = getDictionaryAuth(userParameters[0], connection);
+                case "getDictionaryDef":
+                    response = getDictionaryDef(userParameters[0], connection);
                     break;
                 case "getDatabases":
-                    response = getDatabases();
+                    response = getDatabases(dictionary, connection);
                     break;
                 case "getTables":
+                    currentDictionary = JsonConvert.DeserializeObject(userParameters[0]);
                     response = getTables();
                     break;
                 case "getFields":
+                    currentDictionary = JsonConvert.DeserializeObject(userParameters[1]);
                     response = getFields(userParameters[0]);
                     break;
                 case "getPreview":
+                    currentDictionary = JsonConvert.DeserializeObject(userParameters[1]);
                     response = getPreview(userParameters[0]);
                     break;
                 case "getOAuthAuthorizationUrl":
-                    //we wont have a cached dictionary at this poiny so we need to set it
-                    currentDictionary = JsonConvert.DeserializeObject(getDictionary(userParameters[1], connection));
+                    currentDictionary = JsonConvert.DeserializeObject(userParameters[2]);
                     response = getOAuthAuthorizationUrl(userParameters[0]);
                     break;
                 default:

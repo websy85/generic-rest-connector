@@ -1,5 +1,6 @@
 ﻿<div class="qrest-connect-dialog-container qui-modalbackground">
-    <div class=" card qrest-connect-dialog body qui-delayedModal">
+    <div class="qrest-connect-dialog body qui-delayedModal">
+        <div class="white-qv-loader qv-loader qrest-loader" data-ng-show="isLoading"></div>
         <div class="select-config-dialog">
             <h1>Choose a REST Configuration</h1>
             <ul class="select-config-source dictionary-nav">
@@ -10,7 +11,7 @@
                 <ul>
                     <li ng-repeat="dic in onlineDictionaryList" qva-activate="loadTemplate('connection-settings', '{{dic._id}}', '{{dic.dictionary_url}}','online')" data-next-step="connection-settings">
                         <div class="card dictionary">
-                            <a href="/general/#{dic._id}" class="title">{{dic.display_name}}</a>
+                            <span class="title">{{dic.display_name}}</span>
                             <a class="sub-title">{{dic.owner}}</a>
                             <div class="icon">
                                 <img src="{{dic.icon}}" />
@@ -20,20 +21,22 @@
                 </ul>
             </div>
             <div class="connection-settings" ng-show=" step=='connection-settings' ">
-                <label>Connection Name: </label>
+                <h2>Please provide a name and the Url for the connection</h2>
                 <input ng-model="name" placeholder="Connection Name" />
-                <label>Connection Url: </label>
                 <input ng-model="url" data-parameter="url" placeholder="Url" />
-                <div ng-include src="subpage">
-                    <ng-include/>
+                <div>
+                    <div class="white-qv-loader qv-loader qrest-loader" data-ng-show="subpageLoading"></div>
+                    <div ng-include src="subpage">
+                        <ng-include />
+                    </div>
                 </div>
             </div>
-            <footer class="dm-footer">
-                <qui-button class="qui-button" qva-activate="$event.preventDefault(); onCancelClicked()" q-translation="Common.Cancel"></qui-button>
-                <qui-button class="qui-button" qva-activate="$event.preventDefault(); onOKClicked()" q-translation="Common.Save">
-                    Save
-                </qui-button>
-            </footer>
         </div>
+        <footer class="dm-footer qrest-footer">
+            <qui-button class="qui-button" qva-activate="$event.preventDefault(); onCancelClicked()" q-translation="Common.Cancel"></qui-button>
+            <qui-button class="qui-button" qva-activate="$event.preventDefault(); onOKClicked()" q-translation="Common.Save">
+                Save
+            </qui-button>
+        </footer>
     </div>
 </div>

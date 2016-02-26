@@ -1,6 +1,7 @@
 ﻿define(['qvangular'
 ], function (qvangular) {
     return ['serverside', 'standardSelectDialogService', '$element', 'connectionId', function (serverside, standardSelectDialogService, element, connectionId) {
+        var dictionary;
         var contentProvider = {
             getConnectionInfo: function () {
                 return {
@@ -19,7 +20,9 @@
             },
             getDatabases: function () {
                 return serverside.sendJsonRequest("getDatabases").then(function (response) {
-                    return response.qDatabases;
+                    var data = JSON.parse(response.qMessage);
+                    dictionary = data.dictionary;
+                    return data.qDatabases;
                 });
                 //return { qDatabases: [{qName:"Not Applicable"}] };
             },
@@ -27,17 +30,17 @@
                 return qvangular.promise([{ name: "" }]);
             },
             getTables: function (databaseName, ownerName) {
-                return serverside.sendJsonRequest("getTables").then(function (response) {
+                return serverside.sendJsonRequest("getTables", dictionary).then(function (response) {
                     return JSON.parse(response.qMessage);
                 });
             },
             getFields: function (databaseName, ownerName, tableName) {
-                return serverside.sendJsonRequest("getFields", tableName).then(function (response) {
+                return serverside.sendJsonRequest("getFields", tableName, dictionary).then(function (response) {
                     return JSON.parse(response.qMessage);
                 });
             },
             getPreview: function (databaseName, ownerName, tableName) { //need to add code for preview
-                return serverside.sendJsonRequest("getPreview", tableName).then(function (response) {
+                return serverside.sendJsonRequest("getPreview", tableName, dictionary).then(function (response) {
                     return JSON.parse(response.qMessage);
                 });
 

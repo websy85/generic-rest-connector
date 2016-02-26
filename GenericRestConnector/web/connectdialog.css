@@ -6,7 +6,29 @@
 	width: 70%;
     top: 20%;
     margin: 50px auto;
+    height: calc(100% - 100px);
     background-color: white;
+    position: relative;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.qrest-authorize{
+    text-decoration: none;
+}
+
+.qrest-footer{
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
+.qrest-loader{
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    top: calc(50% - 50px);
+    left: calc(50% - 50px);
 }
 
 .connection-settings input{

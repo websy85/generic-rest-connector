@@ -27,18 +27,29 @@ namespace GenericRestConnector
                 case "OAuth":
                     Auth = new OAuthAuth();
                     break;
+                case "OAuth1.0":
+                    Auth = new OAuth1Auth();
+                    break;
                 default:
                     Auth = new NoAuth();
                     break;
             }
         }
 
-        public WebClient PrepClient(WebClient client)
+        public WebClient PrepClient(WebClient client, AuthInfo info)
         {
+            if (info!=null) 
+            {
+                authInfo = info;
+            }
             return Auth.PrepClient(client, authInfo, authOptions);
         }
         public String PrepUrl(String url)
         {
+            if (url == null)
+            {
+                return null;
+            }
             return Auth.PrepUrl(url, authInfo, authOptions);
         }
     }
