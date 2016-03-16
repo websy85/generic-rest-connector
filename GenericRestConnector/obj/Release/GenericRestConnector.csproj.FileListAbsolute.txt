@@ -10,3 +10,4 @@
 C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.exe.config
 C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.exe
 C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.pdb
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\Release\GenericRestConnector.csprojResolveAssemblyReference.cache

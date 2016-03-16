@@ -14,8 +14,6 @@ namespace GenericRestConnector
         [STAThread]
         static void Main(string[] args)
         {
-            QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Program Start");
-            QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, DateTime.Now.ToLongTimeString());
             if (args != null && args.Length >= 2)
             {
                 new Server().Run(args[0], args[1]);

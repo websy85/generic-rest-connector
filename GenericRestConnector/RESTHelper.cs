@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
+using System.IO;
+using System.Diagnostics;
 using System.Configuration;
 using Newtonsoft.Json;
 using QlikView.Qvx.QvxLibrary;
@@ -33,18 +35,13 @@ namespace GenericRestConnector
             QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Setting up REST Helper");
             client = new WebClient();
 
-            //During a reload the Dictionary JSON is loaded from GitHub. This helps to reduce traffic to the Heroku Dyno 
-            WebClient gitClient = new WebClient();
-            gitClient = AddHeaders(gitClient);
-            //use the token from the config file to authorize the GitHub Request
-            String gitToken = ConfigurationManager.AppSettings["githubtoken"];
-            gitClient.Headers.Add(HttpRequestHeader.Authorization, "token " + gitToken);
-
             String UserName;
             String Password;
             String dictionaryUrl;
             String Token;
             String consumerSecret;
+            String source;
+            String dictionaryId;
 
             //IsMore should start as false and will be re evaluated in the GetJson routine
             IsMore = true;
@@ -56,6 +53,8 @@ namespace GenericRestConnector
             MParameters.TryGetValue("consumer_secret", out consumerSecret);
             MParameters.TryGetValue("url", out UrlBase);
             MParameters.TryGetValue("dictionaryurl", out dictionaryUrl);
+            MParameters.TryGetValue("source", out source);
+            MParameters.TryGetValue("dictionary", out dictionaryId);
 
             authInfo.User = UserName;
             authInfo.Password = Password;
@@ -73,16 +72,33 @@ namespace GenericRestConnector
             {
                 Dictionary = null;
             }
+            Debugger.Launch();
+            String dictionary;
+            if (source == "local")
+            {
+                String configDirectory = @"C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\configs\";
+                dictionary = new StreamReader(configDirectory + dictionaryId + "\\dictionary.json").ReadToEnd();
+            }
+            else
+            {
+                //During an online reload the Dictionary JSON is loaded from GitHub. This helps to reduce traffic to the Heroku Dyno 
+                WebClient gitClient = new WebClient();
+                gitClient = AddHeaders(gitClient);
+                dictionary = gitClient.DownloadString(dictionaryUrl);
+            }
             
-            String dictionary = gitClient.DownloadString(dictionaryUrl);
+            
             if (!String.IsNullOrEmpty(dictionary))
             {
                 
                 Dictionary = JsonConvert.DeserializeObject(dictionary);
-                Dictionary = Dictionary.content.ToString();
-                Dictionary = Convert.FromBase64String(Dictionary);
-                Dictionary = Encoding.UTF8.GetString(Dictionary);
-                Dictionary = JsonConvert.DeserializeObject(Dictionary);
+                if (source == "online")
+                {
+                    Dictionary = Dictionary.content.ToString();
+                    Dictionary = Convert.FromBase64String(Dictionary);
+                    Dictionary = Encoding.UTF8.GetString(Dictionary);
+                    Dictionary = JsonConvert.DeserializeObject(Dictionary);
+                }
                 String authMethod = Dictionary.auth_method.ToString();
                 if (authMethod == "OAuth" && Dictionary.auth_options.auth_version.ToString() == "1.0")
                 {
@@ -144,15 +160,25 @@ namespace GenericRestConnector
         {
             QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Debug, "Getting JSON");
             IsMore = false;
+            String json = "";
             try
             {
-                ActiveResults = JsonConvert.DeserializeObject(client.DownloadString(ActiveUrl));
+                json = client.DownloadString(ActiveUrl);
+                ActiveResults = JsonConvert.DeserializeObject(json);
                 //PageActiveUrl();
                 return ActiveResults;
-            }
+            }           
             catch (WebException ex)
             {
                 QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Error, "Downloading Web Response - " + ex.Status + ": " + ex.Message);
+                QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Url was - " + ActiveUrl);
+                QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Json was - " + json);
+            }
+            catch (Exception ex)
+            {
+                QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Error, "Converting Web Response - " +  ex.Message);
+                QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Url was - " + ActiveUrl);
+                QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Json was - " + json);
             }
             return null;
         }
@@ -236,7 +262,7 @@ namespace GenericRestConnector
 
         private WebClient AddHeaders(WebClient wc)
         {
-            wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+            //wc.Headers[HttpRequestHeader.ContentType] = "application/json";
             wc.Headers[HttpRequestHeader.Accept] = "application/json";
             wc.Headers[HttpRequestHeader.UserAgent] = "generic-rest-connector";
             return wc;

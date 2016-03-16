@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.IO.Compression;
 using QlikView.Qvx.QvxLibrary;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -42,28 +43,52 @@ namespace GenericRestConnector
                     qMessage = errorHelper.NoConfigUrl
                 };
             }
-            String configs = client.DownloadString(publicDictionariesUrl);
-            if (!String.IsNullOrEmpty(configs))
+            try
             {
-                return new Info
+                String configs = client.DownloadString(publicDictionariesUrl);
+                if (!String.IsNullOrEmpty(configs))
                 {
-                    qMessage = configs
-                };
+                    return new Info
+                    {
+                        qMessage = configs
+                    };
+                }
+                else
+                {
+                    return new Info
+                    {
+                        qMessage = errorHelper.ErrorDownloadingData
+                    };
+                }
             }
-            else
+            catch (Exception ex)
             {
                 return new Info
                 {
-                    qMessage = errorHelper.ErrorDownloadingData
+                    qMessage = "\"configs\":[]"
                 };
             }
             
         }
 
-        public QvDataContractResponse getDictionaryDef(String id, QvxConnection connection)
+        public QvDataContractResponse getLocalDictionaries()
         {
-            //Debugger.Launch();
-            String dictionary = getDictionary(id, connection);
+            Catalog.Open();
+            return new Info
+            {
+                qMessage = JsonConvert.SerializeObject(Catalog._catalog)
+            };
+        }
+
+        public QvDataContractResponse updateLocalCatalog()
+        {
+            Catalog.Update();
+            return getLocalDictionaries();
+        }
+
+        public QvDataContractResponse getDictionaryDef(String id, String source, QvxConnection connection)
+        {
+            String dictionary = getDictionary(id, source, connection);
             
             if (!String.IsNullOrEmpty(dictionary))
             {
@@ -71,11 +96,11 @@ namespace GenericRestConnector
                 String factory_oauth_authorize_url;
                 if (dic.auth_options.auth_version!=null && dic.auth_options.auth_version.ToString() == "1.0")
                 {
-                    factory_oauth_authorize_url = ConfigurationManager.AppSettings["FactoryOAuth1AuthorizeUrl"];
+                    factory_oauth_authorize_url = String.Concat(ConfigurationManager.AppSettings["PublicDictionaryHost"], "/api/oauth1_authorize");
                 }
                 else
                 {
-                    factory_oauth_authorize_url = ConfigurationManager.AppSettings["FactoryOAuthAuthorizeUrl"];
+                    factory_oauth_authorize_url = String.Concat(ConfigurationManager.AppSettings["PublicDictionaryHost"], "/api/oauth2_authorize");
                 }
                 dic.factory_oauth_authorize_url = factory_oauth_authorize_url;
                 return new Info
@@ -92,9 +117,9 @@ namespace GenericRestConnector
             }
         }
 
-        public QvDataContractResponse getDatabases(String id, QvxConnection connection)
+        public QvDataContractResponse getDatabases(String id, String source, QvxConnection connection)
         {
-            currentDictionary = getDictionary(id, connection);
+            currentDictionary = getDictionary(id, source, connection);
             String response = "{\"qDatabases\":[{\"qName\": \"Not Applicable\"}]";
             response += ", \"dictionary\":" + currentDictionary + "}";
             return new Info
@@ -104,15 +129,12 @@ namespace GenericRestConnector
             
         }
 
-        public string getDictionary(string id, QvxConnection connection)
+        public string getDictionary(string id, String source, QvxConnection connection)
         {
             QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Getting dictionary");
             QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, DateTime.Now.ToLongTimeString());
-            var d = "";
-            connection.MParameters.TryGetValue("fulldictionary", out d);
-            if (String.IsNullOrEmpty(d))
-            {
-
+            string d = "";
+            if(source=="online"){
 
                 WebClient client = new WebClient();
                 client.Headers.Add("Accept", "application/json");
@@ -132,6 +154,11 @@ namespace GenericRestConnector
                     QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, DateTime.Now.ToLongTimeString());
                     return dictionary;
                 }
+            }
+            else
+            {
+                string configDirectory = @"C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\configs\";
+                return new StreamReader(configDirectory + id + "\\dictionary.json").ReadToEnd();
             }
             return d;           
         }
@@ -194,18 +221,53 @@ namespace GenericRestConnector
             return null;
         }
 
-        public QvDataContractResponse getOAuthAuthorizationUrl(String key)
+        public QvDataContractResponse copyDictionaryToLocal(String owner, String name, String displayName)
         {
-            String redirectUrl = ConfigurationManager.AppSettings["OAuthRedirectUri"];
-            String authorizeUrl = currentDictionary.auth_options.oauth_authorize_url.ToString();
-            
-            string connector_auth_url = String.Format("{0}/{1}",ConfigurationManager.AppSettings["PublicDictionaryHost"], "auth/oauth2_authorize");
-            string authorize_url = String.Format("{0}?client_id={1}&redirect_uri={2}", authorizeUrl , key, redirectUrl);
-            string response = String.Format("{0}\"connector_auth_url\":\"{1}\",\"authorize_url\":\"{2}\"{3}", "{",connector_auth_url, authorize_url,"}");
-            return new Info
+            //Debugger.Launch();
+            Catalog.Open();
+            string dictionaryHost = ConfigurationManager.AppSettings["PublicDictionaryHost"];
+            string repo = String.Format("http://github.com/{0}/{1}", owner, name);
+            string zipurl = String.Format("{0}/archive/master.zip", repo);
+            string configDirectory = @"C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\configs\";
+            WebRequest wr = WebRequest.Create(zipurl) as HttpWebRequest;
+            wr.Method = "GET";
+            String tempPath = Path.GetTempPath();
+            String tempZip = String.Format("{0}{1}.zip", tempPath, name);
+            try
             {
-                qMessage = response
-            };
+                using (var responseStream = wr.GetResponse().GetResponseStream())
+                {                   
+                    using (FileStream fs = new FileStream(tempZip, FileMode.Create, FileAccess.Write))
+                    {
+                        responseStream.CopyTo(fs);                       
+                    }
+                }
+                if (!Directory.Exists(configDirectory + name + "-master"))
+                {
+                    ZipFile.ExtractToDirectory(tempZip, configDirectory);
+                }
+                Catalog.AddEntry(displayName, name, repo);    
+               
+                return new Info
+                {
+                    qMessage = "\"status\":1"
+                };
+
+                //
+            }
+
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+                return new Info
+                {
+                    qMessage = "\"err\":\""+ex.Message+"\""
+                };
+            }
+            
+
+            
+            
         }
 
         public override string HandleJsonRequest(string method, string[] userParameters, QvxConnection connection)
@@ -213,17 +275,22 @@ namespace GenericRestConnector
             connection = (Connection)connection;
             //Debugger.Launch();
             QvDataContractResponse response;
-
-            QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "VariableStore Session is - " + VariableStore.getSession());
-            string provider, url, username, password, dictionary, tempdic;
+            string provider, url, username, password, dictionary, source;
             connection.MParameters.TryGetValue("provider", out provider);
             connection.MParameters.TryGetValue("userid", out username);
             connection.MParameters.TryGetValue("password", out password);
             connection.MParameters.TryGetValue("url", out url);
             connection.MParameters.TryGetValue("dictionary", out dictionary);
+            connection.MParameters.TryGetValue("source", out source);
 
             switch (method)
             {
+                case "getLocalDictionaries":
+                    response = getLocalDictionaries();
+                    break;
+                case "updateLocalCatalog":
+                    response = updateLocalCatalog();
+                    break;
                 case "getOnlineDictionaries":
                     QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "getting dictionaries");
                     QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, DateTime.Now.ToLongTimeString());
@@ -232,10 +299,10 @@ namespace GenericRestConnector
                     QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, DateTime.Now.ToLongTimeString());
                     break;
                 case "getDictionaryDef":
-                    response = getDictionaryDef(userParameters[0], connection);
+                    response = getDictionaryDef(userParameters[0], userParameters[1], connection);
                     break;
                 case "getDatabases":
-                    response = getDatabases(dictionary, connection);
+                    response = getDatabases(dictionary, source, connection);
                     break;
                 case "getTables":
                     currentDictionary = JsonConvert.DeserializeObject(userParameters[0]);
@@ -249,9 +316,8 @@ namespace GenericRestConnector
                     currentDictionary = JsonConvert.DeserializeObject(userParameters[1]);
                     response = getPreview(userParameters[0]);
                     break;
-                case "getOAuthAuthorizationUrl":
-                    currentDictionary = JsonConvert.DeserializeObject(userParameters[2]);
-                    response = getOAuthAuthorizationUrl(userParameters[0]);
+                case "copyDictionaryToLocal":
+                    response = copyDictionaryToLocal(userParameters[0], userParameters[1], userParameters[2]);
                     break;
                 default:
                     response = new Info { qMessage = "Unknown command" };

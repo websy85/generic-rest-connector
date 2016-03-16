@@ -2,26 +2,44 @@
     <div class="qrest-connect-dialog body qui-delayedModal">
         <div class="white-qv-loader qv-loader qrest-loader" data-ng-show="isLoading"></div>
         <div class="select-config-dialog">
-            <h1>Choose a REST Configuration</h1>
-            <ul class="select-config-source dictionary-nav">
-                <li class="nav-button card active">Online</li>
-                <li class="nav-button card">Local</li>
-            </ul>
-            <div class="select-config" ng-show="step=='config-selection'">
-                <ul>
-                    <li ng-repeat="dic in onlineDictionaryList" qva-activate="loadTemplate('connection-settings', '{{dic._id}}', '{{dic.dictionary_url}}','online')" data-next-step="connection-settings">
-                        <div class="card dictionary">
-                            <span class="title">{{dic.display_name}}</span>
-                            <a class="sub-title">{{dic.owner}}</a>
-                            <div class="icon">
-                                <img src="{{dic.icon}}" />
-                            </div>
-                        </div>
-                    </li>
+            <div ng-if="!isEdit">
+                <h2>Choose a REST Configuration</h2>
+                <ul class="select-config-source dictionary-nav">
+                    <li class="nav-button card" ng-class="{active: source=='online'}" ng-click="setSource('online')">Online</li>
+                    <li class="nav-button card" ng-class="{active: source=='local'}" ng-click="setSource('local')">Local</li>
                 </ul>
+            </div>           
+            <div class="select-config" ng-show="step=='config-selection'">
+                <div ng-show="source=='online'">
+                    <ul>
+                        <li ng-repeat="dic in onlineDictionaryList" qva-activate="loadTemplate('connection-settings', '{{dic._id}}', '{{dic.dictionary_url}}')" data-next-step="connection-settings">
+                            <div class="card dictionary">
+                                <span class="title">{{dic.display_name}}</span>
+                                <a class="sub-title">{{dic.owner}}</a>
+                                <div class="icon">
+                                    <img src="{{dic.icon}}" />
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div ng-show="source=='local'">
+                    <qui-button class="qui-button" qva-activate="$event.preventDefault(); updateCatalog()">Update Local Catalog</qui-button>
+                    <br />
+                    <ul>
+                        <li ng-repeat="dic in localDictionaryList" qva-activate="loadTemplate('connection-settings', '{{dic.folder}}', '')" data-next-step="connection-settings">
+                            <div class="card dictionary">
+                                <span class="title">{{dic.displayName}}</span>
+                                <div class="icon">
+                                    <img src="/customdata/64/GenericRestConnector/configs/{{dic.folder}}/icon.png" />
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>               
             </div>
             <div class="connection-settings" ng-show=" step=='connection-settings' ">
-                <h2>Please provide a name and the Url for the connection</h2>
+                <h4>Provide a name and the Url for the connection</h4>
                 <input ng-model="name" placeholder="Connection Name" />
                 <input ng-model="url" data-parameter="url" placeholder="Url" />
                 <div>

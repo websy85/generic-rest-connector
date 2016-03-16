@@ -9,7 +9,6 @@ using System.Dynamic;
 using System.Net;
 using System.Configuration;
 using System.Text.RegularExpressions;
-using System.Runtime.Caching;
 
 namespace GenericRestConnector
 {
@@ -19,14 +18,12 @@ namespace GenericRestConnector
         Int64 recordsLoaded;
         String liveTable;
         public String session;
-        private static MemoryCache grcCache = MemoryCache.Default;
 
         public override void Init()
         {
             //Debugger.Launch();     
             if (helper == null && MParameters != null)
-            {
-                Debugger.Launch();               
+            {             
                 helper = new RESTHelper(MParameters);
             }
         }
