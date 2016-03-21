@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
+using QlikView.Qvx.QvxLibrary;
 
 namespace GenericRestConnector
 {
@@ -46,11 +47,19 @@ namespace GenericRestConnector
         }
         public String PrepUrl(String url)
         {
-            if (url == null)
+            try
             {
+                if (url == null)
+                {
+                    return null;
+                }
+                return Auth.PrepUrl(url, authInfo, authOptions);
+            }
+            catch (Exception ex)
+            {
+                QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Error, ex.Message);
                 return null;
             }
-            return Auth.PrepUrl(url, authInfo, authOptions);
         }
     }
 }

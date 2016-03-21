@@ -41,37 +41,130 @@ namespace GenericRestConnector
             while (helper.IsMore)
             {
                 data = helper.GetJSON();
-
-                if (!String.IsNullOrEmpty(helper.DataElement))
+                //if we have a child link configured
+                if (helper.ActiveTable.has_link_to_child != null && helper.ActiveTable.has_link_to_child==true) 
                 {
-                    data = data[helper.DataElement];
-                }
-                helper.pageInfo.CurrentPageSize = data.Count;
-                helper.pageInfo.CurrentPage++;
-                foreach (dynamic row in data)
-                {
-                    if (recordsLoaded < helper.pageInfo.LoadLimit)
-                    {
-                        yield return InsertRow(row, qTable);
+                    dynamic childData = data;
+                    if(helper.ActiveTable.data_element_override==null || helper.ActiveTable.data_element_override.ToString()==""){
+                        QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Error, "Data Element Override has not been set for Table - "+ helper.ActiveTable.qName);
                     }
                     else
                     {
-                        helper.IsMore = false;
-                        break;
+                        String backupUrl = helper.ActiveUrl;
+                        String childDataElementParam = helper.ActiveTable.data_element_override.ToString();
+                        List<String> childDataElement = childDataElementParam.Split(new String[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                        String childDataUrlElement = childDataElement.Last();
+                        childDataElement.Remove(childDataElement.Last());
+                        foreach (String elem in childDataElement)
+                        {
+                            childData = childData[elem];
+                        }
+                        foreach (dynamic child in childData)
+                        {
+                            helper.ActiveUrl = ((dynamic)child)[childDataUrlElement];
+                            childData = helper.GetJSON();
+
+                            if (helper.ActiveTable.child_data_element != null && helper.ActiveTable.child_data_element.ToString() != "")
+                            {
+                                String childDataElemParam = helper.ActiveTable.child_data_element.ToString();
+                                List<String> childDataElem = childDataElemParam.Split(new String[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                foreach (String elem in childDataElem)
+                                {
+                                    childData = childData[elem];
+                                }
+                            }
+                            Boolean dataIsArray;
+                            try
+                            {
+                                dynamic check = ((Newtonsoft.Json.Linq.JArray)(childData)).Type;    //if this works then the data is an array
+                                dataIsArray = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                dataIsArray = false;
+                            }
+                            if (dataIsArray)
+                            {
+                                foreach (dynamic row in childData)
+                                {
+                                    if (recordsLoaded < helper.pageInfo.LoadLimit)
+                                    {
+                                        yield return InsertRow(row, qTable, child);
+                                    }
+                                    else
+                                    {
+                                        helper.IsMore = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (recordsLoaded < helper.pageInfo.LoadLimit)
+                                {
+                                    yield return InsertRow(childData, qTable, child);
+                                }
+                                else
+                                {
+                                    helper.IsMore = false;
+                                    break;
+                                }
+                            }
+                            
+                        }
+                        helper.ActiveUrl = backupUrl;
+                    }
+                    
+                }
+                else
+                {
+                    if (!String.IsNullOrEmpty(helper.DataElement))
+                    {
+                        List<String> dataElemPath = helper.DataElement.Split(new String[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                        foreach (String elem in dataElemPath)
+                        {
+                            data = data[elem];
+                        }
+                    }
+                    helper.pageInfo.CurrentPageSize = data.Count;
+                    helper.pageInfo.CurrentPage++;
+                    foreach (dynamic row in data)
+                    {
+                        if (recordsLoaded < helper.pageInfo.LoadLimit)
+                        {
+                            yield return InsertRow(row, qTable, null);
+                        }
+                        else
+                        {
+                            helper.IsMore = false;
+                            break;
+                        }
                     }
                 }
+
+                
                 helper.pageInfo.CurrentRecord = recordsLoaded;
                 helper.Page();
+                helper.IsMore = false;
             }
         }
 
-        private QvxDataRow InsertRow(dynamic sourceRow, QvxTable tableDef)
+        private QvxDataRow InsertRow(dynamic sourceRow, QvxTable tableDef, dynamic parentData)
         {
             QvxDataRow destRow = new QvxDataRow();
             foreach (QvxField fieldDef in tableDef.Fields)
             {
                 dynamic originalDef = helper.ActiveFields[fieldDef.FieldName];
-                dynamic sourceField = GetSourceValue(sourceRow, originalDef.path.ToString(), originalDef.type.ToString());
+                dynamic sourceField;
+                if(originalDef.path.ToString().IndexOf("{parent}")==-1){
+                    sourceField = GetSourceValue(sourceRow, originalDef.path.ToString(), originalDef.type.ToString());
+                }
+                else{
+                    String parentPath = originalDef.path.ToString();
+                    parentPath = parentPath.Replace("{parent}.", "");
+                    sourceField = GetSourceValue(parentData, parentPath, originalDef.type.ToString());
+                }
+                
                 if (sourceField != null)
                 {
                     destRow[fieldDef] = sourceField.ToString();
@@ -84,28 +177,21 @@ namespace GenericRestConnector
         private dynamic GetSourceValue(dynamic row, String path, String type)
         {
             dynamic result = row;
-            if (path.IndexOf(".") == -1)
+            string[] Children = path.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (String s in Children)
             {
-                return result[path];
-            }
-            else
-            {
-
-                string[] Children = path.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (String s in Children)
+                if (result[s] != null)
                 {
-                    if (result[s] != null)
-                    {
-                        result = result[s];
-                    }
-                    else
-                    {
-                        return null;
-                    }
-
+                    result = result[s];
                 }
-                return convertToType(result, type);
+                else
+                {
+                    return null;
+                }
+
             }
+            return convertToType(result, type);
+            
         }
 
         private dynamic convertToType(dynamic value, String type)

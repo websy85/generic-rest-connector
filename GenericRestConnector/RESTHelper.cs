@@ -17,7 +17,7 @@ namespace GenericRestConnector
         WebClient client;
         private dynamic ActiveResults;      //Dynamic object to store the active result set in so we don't need to pass it between voids
         public dynamic Dictionary { get; set; } //Json config definition
-        private dynamic ActiveTable { get; set; }   //Json definition of the table currently being loaded         
+        public dynamic ActiveTable { get; set; }   //Json definition of the table currently being loaded         
         public Dictionary<String, dynamic> ActiveFields { get; set; }   //Reorganised Json definition of the fields for the active table       
         public Boolean IsMore { get; set; }     //Boolean that identifies if there is more data to be loaded
         public String DataElement { get; set; }     //Element that identifies where the data is accessed
@@ -185,9 +185,31 @@ namespace GenericRestConnector
 
         public void Page()
         {
-            ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint.ToString(), ActiveTable.endpoint.ToString(), pageInfo);
-            //add any authentication url stuff
-            ActiveUrl = authentication.PrepUrl(ActiveUrl);
+            //at present supplied url paging doesn't fit into the 'generic' paging model
+            if (Dictionary.paging_method.ToString() == "Supplied URL")
+            {
+                ActiveUrl = "";
+                if (Dictionary.paging_options.supplied_url_element!=null)
+                {
+                    dynamic temp = ActiveResults;
+                    String suppliedUrlPath = Dictionary.paging_options.supplied_url_element.ToString();
+                    if (!String.IsNullOrEmpty(suppliedUrlPath))
+                    {
+                        List<String> pagingElemPath = suppliedUrlPath.Split(new String[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                        foreach (String elem in pagingElemPath)
+                        {
+                            temp = temp[elem];
+                        }
+                        ActiveUrl = temp;
+                    }
+                }
+            }
+            else
+            {
+                ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint.ToString(), ActiveTable.endpoint.ToString(), pageInfo);
+                //add any authentication url stuff
+                ActiveUrl = authentication.PrepUrl(ActiveUrl);
+            }
             if(String.IsNullOrEmpty(ActiveUrl))
             {
                 IsMore = false;

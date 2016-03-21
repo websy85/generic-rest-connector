@@ -11,12 +11,32 @@ namespace GenericRestConnector
     {
         public override System.Net.WebClient PrepClient(System.Net.WebClient client, AuthInfo info, dynamic options)
         {
-            client.Headers[HttpRequestHeader.Authorization] = string.Format("Bearer {0}", info.oauth2Token);
+            if (options.oauth_params_in_query!=null && options.oauth_params_in_query == true)
+            {
+
+            }
+            else
+            {
+                client.Headers[HttpRequestHeader.Authorization] = string.Format("Bearer {0}", info.oauth2Token);
+            }
             return client;
         }
 
         public override string PrepUrl(string url, AuthInfo info, dynamic options)
         {
+            if (options.oauth_params_in_query!=null && options.oauth_params_in_query == true)
+            {
+                if (url.IndexOf("?") == -1)
+                {
+                    url += "?";
+                }
+                else
+                {
+                    url += "&";
+                }
+                url += "access_token=";
+                url += info.oauth2Token;
+            }
             return url;
         }
     }
