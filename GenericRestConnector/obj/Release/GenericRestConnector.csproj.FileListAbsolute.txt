@@ -11,3 +11,9 @@ C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestC
 C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.exe
 C:\Program Files\Common Files\Qlik\Custom Data\GenericRestConnector\GenericRestConnector.pdb
 \\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\Release\GenericRestConnector.csprojResolveAssemblyReference.cache
+Z:\Users\nwr\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\Release\GenericRestConnector.exe.config
+Z:\Users\nwr\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\Release\GenericRestConnector.exe
+Z:\Users\nwr\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\Release\GenericRestConnector.pdb
+\\psf\Home\Documents\GenericRestConnector\GenericRestConnector.exe.config
+\\psf\Home\Documents\GenericRestConnector\GenericRestConnector.exe
+\\psf\Home\Documents\GenericRestConnector\GenericRestConnector.pdb

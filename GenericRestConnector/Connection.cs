@@ -233,6 +233,7 @@ namespace GenericRestConnector
                 }
                 //Establish Table Name
                 fields = match.Groups["fields"].Value;
+                fields = fields.Trim();
                 liveTable = match.Groups["table"].Value;
             }
             catch (Exception ex)

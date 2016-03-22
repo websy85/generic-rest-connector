@@ -16,7 +16,6 @@ namespace GenericRestConnector
     class Server : QvxServer
     {
         dynamic currentDictionary;
-        String session;
         ErrorHelper errorHelper = new ErrorHelper();
         public override QvxConnection CreateConnection()
         {

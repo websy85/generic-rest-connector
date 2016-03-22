@@ -1,0 +1,89 @@
+﻿.qrest-connect-dialog-container {
+	
+}
+
+.qrest-connect-dialog {
+	width: 70%;
+    top: 20%;
+    margin: 50px auto;
+    height: calc(100% - 100px);
+    background-color: white;
+    position: relative;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.qrest-authorize{
+    text-decoration: none;
+}
+
+.qrest-footer{
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
+.qrest-loader{
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    top: calc(50% - 50px);
+    left: calc(50% - 50px);
+}
+
+.connection-settings input{
+    display: block;
+    width: 96%;
+    height: 25px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+.select-config-dialog, .connection-settings{
+    padding: 5px;
+}
+
+.select-config-source{
+    height: 80px;
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.select-config-source li{
+    list-style-type: none;
+    display: inline-block;
+    width: 12% !important;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-right: 10px;
+    line-height: 60px !important;
+}
+
+.select-config ul{
+    list-style-type: none;
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.select-config li{
+    display: inline-block;
+    width: 20%;
+    margin-left: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.subpage{
+    margin-top: 20px;
+}

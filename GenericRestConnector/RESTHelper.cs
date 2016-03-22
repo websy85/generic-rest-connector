@@ -72,7 +72,7 @@ namespace GenericRestConnector
             {
                 Dictionary = null;
             }
-            Debugger.Launch();
+  
             String dictionary;
             if (source == "local")
             {
@@ -226,11 +226,19 @@ namespace GenericRestConnector
             dynamic table = getTableByName(tableName);
             foreach (dynamic f in table.fields)
             {
-                if (fields.IndexOf(f.qName.ToString()) != -1)
+                if (fields == "*")
                 {
-                    //Need to add functionality for converting types
                     fList.Add(new QvxField(f.qName.ToString(), getFieldType(f.type.ToString()), QvxNullRepresentation.QVX_NULL_FLAG_SUPPRESS_DATA, getFieldAttr(f.type.ToString())));
                 }
+                else
+                {
+                    if (fields.IndexOf(f.qName.ToString()) != -1)
+                    {
+                        //Need to add functionality for converting types
+                        fList.Add(new QvxField(f.qName.ToString(), getFieldType(f.type.ToString()), QvxNullRepresentation.QVX_NULL_FLAG_SUPPRESS_DATA, getFieldAttr(f.type.ToString())));
+                    }
+                }
+                
             }
             return fList.ToArray<QvxField>();
         }
