@@ -70,6 +70,12 @@
     line-height: 60px !important;
 }
 
+.select-config{
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 10px 2px;
+}
+
 .select-config ul{
     list-style-type: none;
     margin-left: -10px;
@@ -78,7 +84,7 @@
 
 .select-config li{
     display: inline-block;
-    width: 20%;
+    width: 23%;
     margin-left: 10px;
     margin-right: 10px;
     cursor: pointer;
@@ -86,4 +92,14 @@
 
 .subpage{
     margin-top: 20px;
+}
+
+
+.loading-container .message{
+    position: absolute;
+    height: 100px;
+    width: 40%;
+    top: calc(50% + 100px);
+    left: calc(30%);
+    text-align: center;
 }

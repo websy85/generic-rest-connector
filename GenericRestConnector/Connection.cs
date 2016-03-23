@@ -215,6 +215,7 @@ namespace GenericRestConnector
             //Debugger.Launch();
             //NOTE: Where clause not yet supported
             String fields = "";
+            String where = "";
             query = query.Replace("\r\n", " ");
             try
             {
@@ -234,6 +235,10 @@ namespace GenericRestConnector
                 //Establish Table Name
                 fields = match.Groups["fields"].Value;
                 fields = fields.Trim();
+                if(match.Groups["where"]!=null){
+                    where = match.Groups["where"].Value;
+                    where = where.Trim();
+                }
                 liveTable = match.Groups["table"].Value;
             }
             catch (Exception ex)
@@ -242,7 +247,7 @@ namespace GenericRestConnector
             }
             if (!String.IsNullOrEmpty(liveTable) && helper!=null)
             {
-                helper.SetActiveTable(liveTable);
+                helper.SetActiveTable(liveTable, where);
                 //Create QvxTable based on fields in Select statement
                 MTables = new List<QvxTable>();
                 QvxTable qT = new QvxTable { TableName = liveTable, Fields = helper.createFieldList(liveTable, fields), GetRows = GetData };

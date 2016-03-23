@@ -6,12 +6,13 @@
                 $scope.isEdit = input.editMode;
                 $scope.isLoading = true;
                 $scope.auth_method;
-                $scope.subpageLoading = true;
+                $scope.subpageLoading = false;
                 $scope.id = input.instanceId;
                 $scope.connectionParameters = {};
                 $scope.localDictionaryList = [];
                 $scope.onlineDictionaryList = [];
                 $scope.source = "online";
+                $scope.dictionaryIndex;
                 $scope.step = "config-selection";
                 $scope.connectionTemplates = {
                     None: "/customdata/64/GenericRestConnector/web/noAuth.ng.html",
@@ -22,6 +23,7 @@
                 };
                 $scope.name;
                 $scope.username;
+                $scope.loadingMessage = "Fetching Online and Local dictionaries. Please bare with us.";
                 $scope.password;
                 $scope.token;
                 $scope.consumer_secret;
@@ -113,6 +115,11 @@
                 }
             };
 
+            $scope.backToCatalog = function () {
+                $scope.step = "config-selection";
+                $scope.subpage = null;
+            };
+
             //display the appropriate step
             $scope.nextStep = function (step) {
                 $scope.step = step;
@@ -133,11 +140,22 @@
             };
 
             //load and display the required template based on the config auth setting
-            $scope.loadTemplate = function (step, id, dicurl) {
+            $scope.loadTemplate = function (step, index, dicurl) {
+                $scope.subpageLoading = true;
                 this.nextStep(step);
-                $scope.dictionaryId = id;
+                if (!$scope.isEdit) {
+                    if ($scope.source == "online") {
+                        $scope.selectedDictionaryInfo = $scope.onlineDictionaryList[index];
+                        $scope.dictionaryId = $scope.onlineDictionaryList[index]._id;
+                    }
+                    else {
+                        $scope.selectedDictionaryInfo = $scope.localDictionaryList[index];
+                        $scope.dictionaryId = $scope.localDictionaryList[index].folder;
+                    }
+                }
                 $scope.dicurl = dicurl;
-                input.serverside.sendJsonRequest("getDictionaryDef", id, $scope.source).then(function (response) {
+                $scope.loadingMessage = "Downloading Dictionary Definition...";
+                input.serverside.sendJsonRequest("getDictionaryDef", $scope.dictionaryId, $scope.source).then(function (response) {
                     $scope.dictionaryDef = JSON.parse(response.qMessage);
                     $scope.auth_method = $scope.dictionaryDef.auth_method;
                     $scope.subpage = $scope.connectionTemplates[$scope.dictionaryDef.auth_method];

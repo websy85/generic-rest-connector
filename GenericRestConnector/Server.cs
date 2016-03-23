@@ -29,7 +29,7 @@ namespace GenericRestConnector
 
         public QvDataContractResponse getOnlineDictionaries()
         {
-            //Debugger.Launch();
+            Debugger.Launch();
             WebClient client = new WebClient();
             client.Headers.Add("Accept", "application/json");
 
@@ -64,7 +64,7 @@ namespace GenericRestConnector
             {
                 return new Info
                 {
-                    qMessage = "\"configs\":[]"
+                    qMessage = "{\"configs\":[]}"
                 };
             }
             
@@ -87,6 +87,7 @@ namespace GenericRestConnector
 
         public QvDataContractResponse getDictionaryDef(String id, String source, QvxConnection connection)
         {
+            //Debugger.Launch();
             String dictionary = getDictionary(id, source, connection);
             
             if (!String.IsNullOrEmpty(dictionary))

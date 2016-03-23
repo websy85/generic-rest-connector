@@ -16,3 +16,4 @@ C:\GenericRestConnector\GenericRestConnector.pdb
 Y:\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\GenericRestConnector.exe.config
 Y:\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\GenericRestConnector.exe
 Y:\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\GenericRestConnector.pdb
+\\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Release\GenericRestConnector.csprojResolveAssemblyReference.cache

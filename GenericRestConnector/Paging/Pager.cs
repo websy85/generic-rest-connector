@@ -30,7 +30,7 @@ namespace GenericRestConnector
             }
         }
 
-        public String PrepUrl(String baseUrl, String baseEndpoint, String table, PageInfo pageInfo)
+        public String PrepUrl(String baseUrl, String baseEndpoint, String table, String where, PageInfo pageInfo)
         {
             //we'll do some generic checks to see if we should be loading data
             //is the current record >= loadlimit
@@ -51,6 +51,10 @@ namespace GenericRestConnector
             else
             {
                 url = String.Format("{0}/{1}", baseUrl, table);
+            }
+            if (!String.IsNullOrEmpty(where))
+            {
+                url += where;
             }
             if (Page != null)
             {

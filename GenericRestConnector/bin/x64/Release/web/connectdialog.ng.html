@@ -1,21 +1,27 @@
 ﻿<div class="qrest-connect-dialog-container qui-modalbackground">
     <div class="qrest-connect-dialog body qui-delayedModal">
-        <div class="white-qv-loader qv-loader qrest-loader" data-ng-show="isLoading"></div>
+        <div class="loading-container" data-ng-show="isLoading">
+            <div class="white-qv-loader qv-loader qrest-loader"></div>
+            <div class="message">{{loadingMessage}}</div>
+        </div>
         <div class="select-config-dialog">
-            <div ng-if="!isEdit">
-                <h2>Choose a REST Configuration</h2>
-                <ul class="select-config-source dictionary-nav">
+            <div ng-if="!isEdit && step=='config-selection'">
+                <h1>Choose a REST Configuration</h1>
+                <ul ng-show="!isLoading" class="select-config-source dictionary-nav">
                     <li class="nav-button card" ng-class="{active: source=='online'}" ng-click="setSource('online')">Online</li>
                     <li class="nav-button card" ng-class="{active: source=='local'}" ng-click="setSource('local')">Local</li>
                 </ul>
-            </div>           
+            </div> 
+            <div ng-if="!isEdit && step!='config-selection'">
+                <button ng-show="!isLoading && !subpageLoading" class="back-button" qva-activate="backToCatalog()">Back to Catalog</button>
+            </div>          
             <div class="select-config" ng-show="step=='config-selection'">
                 <div ng-show="source=='online'">
                     <ul>
-                        <li ng-repeat="dic in onlineDictionaryList" qva-activate="loadTemplate('connection-settings', '{{dic._id}}', '{{dic.dictionary_url}}')" data-next-step="connection-settings">
+                        <li ng-repeat="dic in onlineDictionaryList" qva-activate="loadTemplate('connection-settings', '{{$index}}', '{{dic.dictionary_url}}')" data-next-step="connection-settings">
                             <div class="card dictionary">
                                 <span class="title">{{dic.display_name}}</span>
-                                <a class="sub-title">{{dic.owner}}</a>
+                                <div class="sub-title">{{dic.owner}}</div>
                                 <div class="icon">
                                     <img src="{{dic.icon}}" />
                                 </div>
@@ -24,10 +30,10 @@
                     </ul>
                 </div>
                 <div ng-show="source=='local'">
-                    <qui-button class="qui-button" qva-activate="$event.preventDefault(); updateCatalog()">Update Local Catalog</qui-button>
+                    <button class="primary-button" qva-activate="$event.preventDefault(); updateCatalog()">Update Local Catalog</button>
                     <br />
                     <ul>
-                        <li ng-repeat="dic in localDictionaryList" qva-activate="loadTemplate('connection-settings', '{{dic.folder}}', '')" data-next-step="connection-settings">
+                        <li ng-repeat="dic in localDictionaryList" qva-activate="loadTemplate('connection-settings', '{{$index}}', '')" data-next-step="connection-settings">
                             <div class="card dictionary">
                                 <span class="title">{{dic.displayName}}</span>
                                 <div class="icon">
@@ -41,10 +47,14 @@
             <div class="connection-settings" ng-show=" step=='connection-settings' ">
                 <h4>Provide a name and the Url for the connection</h4>
                 <input ng-model="name" placeholder="Connection Name" />
+                <div class="vertical-spacer"></div>
                 <input ng-model="url" data-parameter="url" placeholder="Url" />
                 <div>
-                    <div class="white-qv-loader qv-loader qrest-loader" data-ng-show="subpageLoading"></div>
-                    <div ng-include src="subpage">
+                    <div class="loading-container" data-ng-show="subpageLoading">
+                        <div class="white-qv-loader qv-loader qrest-loader"></div>
+                        <div class="message">{{loadingMessage}}</div>
+                    </div>
+                    <div data-ng-show="!subpageLoading" ng-include src="subpage">
                         <ng-include />
                     </div>
                 </div>

@@ -23,6 +23,7 @@ namespace GenericRestConnector
         public String DataElement { get; set; }     //Element that identifies where the data is accessed
         public String ActiveUrl { get; set; }   //Current Url used for loading Json
         public String UrlBase;
+        private String Where;
 
         public AuthInfo authInfo = new AuthInfo();
         public Authentication authentication;
@@ -109,8 +110,11 @@ namespace GenericRestConnector
             }
         }
 
-        public void SetActiveTable(String tableName)
+        public void SetActiveTable(String tableName, String whereClause)
         {
+            
+            Where = whereClause;
+            
             foreach (dynamic t in Dictionary.tables)
             {
                 if (t.qName == tableName)
@@ -148,7 +152,7 @@ namespace GenericRestConnector
             //add the headers to the web client
             client = AddHeaders(client);
             //build the initial url
-            ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint.ToString(), ActiveTable.endpoint.ToString(), pageInfo);
+            ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint.ToString(), ActiveTable.endpoint.ToString(), Where, pageInfo);
             //add any authentication url stuff
             ActiveUrl = authentication.PrepUrl(ActiveUrl);
             //prep the WebClient with any authentication steps. we perform this last in case we're authenticating with oAuth 1.0a
@@ -206,7 +210,7 @@ namespace GenericRestConnector
             }
             else
             {
-                ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint.ToString(), ActiveTable.endpoint.ToString(), pageInfo);
+                ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint.ToString(), ActiveTable.endpoint.ToString(), Where, pageInfo);
                 //add any authentication url stuff
                 ActiveUrl = authentication.PrepUrl(ActiveUrl);
             }
