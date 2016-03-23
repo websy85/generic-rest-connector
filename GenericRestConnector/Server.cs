@@ -29,7 +29,7 @@ namespace GenericRestConnector
 
         public QvDataContractResponse getOnlineDictionaries()
         {
-            Debugger.Launch();
+            //Debugger.Launch();
             WebClient client = new WebClient();
             client.Headers.Add("Accept", "application/json");
 
