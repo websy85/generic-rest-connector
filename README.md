@@ -47,4 +47,4 @@ Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory
 
 Enjoy!
 
-[factory]: factory.png "Dictionary Factory Catalog"
+[factory]: Factory.png "Dictionary Factory Catalog"
