@@ -19,6 +19,9 @@ Both the **Connector** and **Dictionary Factory** are Open Source so feel free t
 ### Online Dictionaries
 The online dictionary list is comprised of dictionaries built and published via the [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com).
 
+#####Dictionary Factory
+![alt text][factory]
+
 ### Local Dictionaries
 All published dictionaries and your own private (unpublished) dictionaries can be downloaded and stored locally to the connector. Local dictionaries should be put into **C:\Program Files\Common Files\Qlik\Custom Data\GenericRESTConnector\configs**. To expose them to the connector -
 
@@ -43,3 +46,5 @@ Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory
 * Url
 
 Enjoy!
+
+[factory]: factory.png "Dictionary Factory Catalog"
