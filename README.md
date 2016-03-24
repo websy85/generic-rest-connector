@@ -22,6 +22,9 @@ The online dictionary list is comprised of dictionaries built and published via 
 #####Dictionary Factory
 ![alt text][factory]
 
+#####Connector Online Catalog
+![alt text][public]
+
 ### Local Dictionaries
 All published dictionaries and your own private (unpublished) dictionaries can be downloaded and stored locally to the connector. Local dictionaries should be put into **C:\Program Files\Common Files\Qlik\Custom Data\GenericRESTConnector\configs**. To expose them to the connector -
 
@@ -29,6 +32,9 @@ All published dictionaries and your own private (unpublished) dictionaries can b
 2. Create a new connection, selecting **Generic REST Connector**.
 3. Click on the **Local** tab.
 4. Click **Update Local Catalog**.
+
+#####Connector Local Catalog
+![alt text][local]
 
 ### Authentication
 Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com) facilitates the following authentication methods
@@ -48,3 +54,5 @@ Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory
 Enjoy!
 
 [factory]: Factory.png "Dictionary Factory Catalog"
+[public]: Public.png "Connector Public Catalog"
+[local]: Local.png "Connector Local Catalog"
