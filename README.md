@@ -21,7 +21,8 @@ The online dictionary list is comprised of dictionaries built and published via 
 
 ### Local Dictionaries
 All published dictionaries and your own private (unpublished) dictionaries can be downloaded and stored locally to the connector. Local dictionaries should be put into _C:\Program Files\Common Files\Qlik\Custom Data\GenericRESTConnector\configs_. To expose them to the connector -
+
 1. Open the _Load Editor_
 2. Create a new connection, selecting _Generic REST Connector_
 3. Click on the _Local_ tab
-4. Click 
+4. Click _Update Local Catalog_
