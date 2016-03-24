@@ -1,5 +1,5 @@
-## Generic REST Connector
-for Qlik Sense
+## Generic REST Connector for Qlik Sense
+**Note** This connector is currently in an experimental state. Please feel free to use and abuse it but remember it may not work with certain REST APIs depending on their configuration. I also can't guarantee the quality of the published dictionaries.
 
 ### Summary
 This connector works by interpreting a definition stored within a "dictionary" in order to retrieve data from the desired REST API. The dictionary contains information about where the REST API lives, the *Authentication* method it uses, how it *Pages* data and what the *Schema* of the different endpoints looks like. 
@@ -26,3 +26,18 @@ All published dictionaries and your own private (unpublished) dictionaries can b
 2. Create a new connection, selecting **Generic REST Connector**.
 3. Click on the **Local** tab.
 4. Click **Update Local Catalog**.
+
+### Authentication
+Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com) facilitates the following authentication methods
+* Basic (Username/Password)
+* API Key (Usually a parameter passed in via the url)
+* OAuth 1.0a
+* OAuth 2.0
+
+**Note** Both the Connector and [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com) provide a workflow for getting an Access Token. If you would like to leverage this you can use **https://rest-dictionary-factory.herokuapp.com/auth/oauth** as your OAuth application redirect uri. 
+
+### Paging
+Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com) facilitates the following paging methods
+* Page Number
+* Offset / Limit
+* Url
