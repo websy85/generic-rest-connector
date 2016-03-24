@@ -43,7 +43,7 @@ Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory
 * OAuth 1.0a
 * OAuth 2.0
 
-**Note:** Both the Connector and [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com) provide a workflow for getting an Access Token. If you would like to leverage this you can use <a href="">https://rest-dictionary-factory.herokuapp.com/auth/oauth</a> as your OAuth application redirect uri. 
+**Note:** Both the Connector and [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com) provide a workflow for getting an Access Token. If you would like to leverage this you can use `https://rest-dictionary-factory.herokuapp.com/auth/oauth` as your OAuth application redirect uri. 
 
 ### Paging
 Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com) facilitates the following paging methods
