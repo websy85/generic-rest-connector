@@ -37,7 +37,7 @@ namespace GenericRestConnector
             //Get a reference to the QvxTable from MTables
             QvxTable qTable = FindTable(liveTable, MTables);
             helper.Prep();
-
+            
             while (helper.IsMore)
             {
                 data = helper.GetJSON();
@@ -145,7 +145,6 @@ namespace GenericRestConnector
                 
                 helper.pageInfo.CurrentRecord = recordsLoaded;
                 helper.Page();
-                helper.IsMore = false;
             }
         }
 
