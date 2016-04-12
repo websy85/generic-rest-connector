@@ -36,7 +36,13 @@ All published dictionaries and your own private (unpublished) dictionaries can b
 #####Connector Local Catalog
 ![alt text][local]
 
-### Authentication
+### WHERE Clauses
+Currently any where clause added in the Load Script will be appended to the url for the call to the REST API. So for example, if you're connecting to Twitter and using the **search/tweets.json** endpoint, you can add a where clause of 
+
+`?q=qlikbranch`
+
+### Additional Info
+##### Authentication
 Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com) facilitates the following authentication methods
 * Basic (Username/Password)
 * API Key (Usually a parameter passed in via the url)
@@ -45,7 +51,7 @@ Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory
 
 **Note:** Both the Connector and [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com) provide a workflow for getting an Access Token. If you would like to leverage this you can use `https://rest-dictionary-factory.herokuapp.com/auth/oauth` as your OAuth application redirect uri. 
 
-### Paging
+##### Paging
 Currently the Connector and [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com) facilitates the following paging methods
 * Page Number
 * Offset / Limit
