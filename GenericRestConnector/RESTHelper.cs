@@ -162,6 +162,7 @@ namespace GenericRestConnector
 
         public dynamic GetJSON()
         {
+            Debugger.Launch();
             QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Debug, "Getting JSON");
             IsMore = false;
             String json = "";

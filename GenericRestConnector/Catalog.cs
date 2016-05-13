@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace GenericRestConnector
 {
@@ -42,8 +43,8 @@ namespace GenericRestConnector
                 {
                     String dirName = dir.Split(new string[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last<String>();
                     dynamic dictionary = JsonConvert.DeserializeObject(new StreamReader(dir+"\\dictionary.json").ReadToEnd());
-                    if(_catalog.configs[dictionary.id.ToString()]==null){
-                        AddEntry(dictionary.display_name.ToString(), dirName, dictionary.id.ToString());
+                    if(_catalog.configs[dictionary.name.ToString()]==null){
+                        AddEntry(dictionary.display_name.ToString(), dirName, dictionary.name.ToString());
                     }
                 }
             }
