@@ -39,8 +39,35 @@ namespace GenericRestConnector
             helper.Prep();
             
             while (helper.IsMore)
-            {
-                data = helper.GetJSON();
+            {    
+                if ( helper.cacheEndpointMap.ContainsKey(helper.ActiveTable.endpoint.ToString()))
+                {
+                    String cachedTable = helper.cacheEndpointMap[helper.ActiveTable.endpoint.ToString()];
+                    if (cachedTable != liveTable)
+                    {
+                        data = helper.getCachedData(cachedTable, helper.pageInfo.CurrentPage);
+                    }
+                    else
+                    {
+                        data = helper.GetJSON();
+                    }
+                }
+                else{
+                    data = helper.GetJSON();
+                }
+                if (data == null)
+                {
+                    QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "End of data (" + liveTable + ")");
+                    break;
+                }
+                if (helper.tableCacheList.IndexOf(liveTable) != -1)
+                {
+                    if (!helper.cacheEndpointMap.ContainsKey(helper.ActiveTable.endpoint.ToString()))
+                    {
+                        helper.cacheEndpointMap.Add(helper.ActiveTable.endpoint.ToString(), liveTable);
+                    }
+                    helper.cacheTable(liveTable, helper.pageInfo.CurrentPage, data);
+                }
                 //if we have a child link configured
                 if (helper.ActiveTable.has_link_to_child != null && helper.ActiveTable.has_link_to_child==true) 
                 {
@@ -126,20 +153,65 @@ namespace GenericRestConnector
                             data = data[elem];
                         }
                     }
-                    helper.pageInfo.CurrentPageSize = data.Count;
-                    helper.pageInfo.CurrentPage++;
-                    foreach (dynamic row in data)
+                    if (helper.ActiveTable.child_data_element != null && helper.ActiveTable.child_data_element.ToString() != "")
                     {
-                        if (recordsLoaded < helper.pageInfo.LoadLimit)
+                        String childDataElemParam = helper.ActiveTable.child_data_element.ToString();
+                        foreach (dynamic row in data)
                         {
-                            yield return InsertRow(row, qTable, null);
+                            dynamic childData = row;
+                            List<String> childDataElem = childDataElemParam.Split(new String[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                            foreach (String elem in childDataElem)
+                            {
+                                childData = childData[elem];
+                            }
+                            if (childData != null)
+                            {
+                                foreach (dynamic childRow in childData)
+                                {
+                                    yield return InsertRow(childRow, qTable, row);
+                                }
+                            }
+                            
+                            if (recordsLoaded >= helper.pageInfo.LoadLimit)
+                            {                           
+                                helper.IsMore = false;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        helper.pageInfo.CurrentPageSize = Convert.ToInt32(data.Count);
+                        //helper.pageInfo.CurrentPage++;
+                        if (data.GetType().Name == "JArray")
+                        {
+                            foreach (dynamic row in data)
+                            {
+                                if (recordsLoaded < helper.pageInfo.LoadLimit)
+                                {
+                                    yield return InsertRow(row, qTable, null);
+                                }
+                                else
+                                {
+                                    helper.IsMore = false;
+                                    break;
+                                }
+                            }
                         }
                         else
                         {
-                            helper.IsMore = false;
-                            break;
+                            if (recordsLoaded < helper.pageInfo.LoadLimit)
+                            {
+                                yield return InsertRow(data, qTable, null);
+                            }
+                            else
+                            {
+                                helper.IsMore = false;
+                                break;
+                            }
                         }
                     }
+                    
                 }
 
                 
@@ -168,6 +240,10 @@ namespace GenericRestConnector
                 {
                     destRow[fieldDef] = sourceField.ToString();
                 }
+                else if (originalDef.path.ToString()=="")
+                {
+                    sourceField = GetSourceValue(sourceRow, null, originalDef.type.ToString());
+                }
             }
             recordsLoaded++;
             return destRow;
@@ -176,19 +252,23 @@ namespace GenericRestConnector
         private dynamic GetSourceValue(dynamic row, String path, String type)
         {
             dynamic result = row;
-            string[] Children = path.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (String s in Children)
+            if (!String.IsNullOrEmpty(path))
             {
-                if (result[s] != null)
+                string[] Children = path.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (String s in Children)
                 {
-                    result = result[s];
-                }
-                else
-                {
-                    return null;
-                }
+                    if (result[s] != null)
+                    {
+                        result = result[s];
+                    }
+                    else
+                    {
+                        return null;
+                    }
 
+                }
             }
+            
             return convertToType(result, type);
             
         }
@@ -219,14 +299,8 @@ namespace GenericRestConnector
             try
             {
                 Match match;
-                if (query.ToUpper().Contains(" WHERE "))
-                {
-                    match = Regex.Match(query, @"SELECT\s+(?<fields>.+)\sFROM\s+(?<table>.+)\sWHERE\s+(?<where>.+)", RegexOptions.IgnoreCase);
-                }
-                else
-                {
-                    match = Regex.Match(query, @"SELECT\s+(?<fields>.+)\sFROM\s+(?<table>\w+)", RegexOptions.IgnoreCase);
-                }
+                match = Regex.Match(query, @"(?:select\s(?<fields>[^\/\r\n]*))\s(?:from\s(?<table>[^\/\r\n\s]+))\s*(?:where\s(?<where>[^\/\r\n\s]*))?(?:\s*)(?:limit\s(?<limit>[^\/\r\n\s]*))?(?:\s*)(?<cache>cache)?", RegexOptions.IgnoreCase);
+                
                 if (!match.Success)
                 {
                     QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Error, string.Format("ExtractQueryAndTransmitTableHeader() - QvxPleaseSendReplyException({0}, \"Invalid query: {1}\")", QvxResult.QVX_SYNTAX_ERROR, query));
@@ -239,6 +313,10 @@ namespace GenericRestConnector
                     where = where.Trim();
                 }
                 liveTable = match.Groups["table"].Value;
+                if (match.Groups["cache"].Value.ToLower() == "cache")
+                {
+                    helper.addTableToCacheList(liveTable);
+                }
             }
             catch (Exception ex)
             {

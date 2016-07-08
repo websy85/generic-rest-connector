@@ -19,6 +19,7 @@ namespace GenericRestConnector
             {
                 case "Pages":
                     CanPage = true;
+                    Page = new PagePaging();
                     break;
                 case "Offset/Limit":
                     CanPage = true;

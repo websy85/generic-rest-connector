@@ -25,6 +25,10 @@ namespace GenericRestConnector
         public String UrlBase;
         private String Where;
 
+        public List<String> tableCacheList = new List<string>();
+        public Dictionary<String, String> cacheEndpointMap = new Dictionary<string, string>();
+        public Dictionary<String, dynamic> cachedTables = new Dictionary<String, dynamic>(); 
+
         public AuthInfo authInfo = new AuthInfo();
         public Authentication authentication;
 
@@ -110,9 +114,35 @@ namespace GenericRestConnector
             }
         }
 
+        public void addTableToCacheList(String tableName)
+        {
+            tableCacheList.Add(tableName);
+        }
+
+        public void cacheTable(String tableName, Int32 pageNumber, dynamic data)
+        {
+            TableCache t = new TableCache(pageNumber, data);
+            cachedTables.Add(tableName+pageNumber.ToString(), t);
+        }
+
+        public dynamic getCachedData(String tableName, Int32 pageNumber)
+        {
+            //Debugger.Launch();
+            foreach (KeyValuePair<String, dynamic> kvp in cachedTables.Where(item => item.Key==(tableName+pageNumber.ToString())).ToList())
+            {
+                TableCache tc = kvp.Value;
+                if (tc.page == pageNumber)
+                {
+                    return tc.data;
+                }
+            }
+            return null;
+        }
+
         public void SetActiveTable(String tableName, String whereClause)
         {
-            
+            pageInfo.CurrentPage = 0;
+            pageInfo.CurrentRecord = 0;
             Where = whereClause;
             
             foreach (dynamic t in Dictionary.tables)
@@ -148,7 +178,7 @@ namespace GenericRestConnector
         {
             IsMore = true;
             pageInfo.CurrentRecord = 0;
-            pageInfo.CurrentPageSize = null;
+            pageInfo.CurrentPageSize = -1;
             //add the headers to the web client
             client = AddHeaders(client);
             //build the initial url
@@ -162,13 +192,14 @@ namespace GenericRestConnector
 
         public dynamic GetJSON()
         {
-            Debugger.Launch();
+            //Debugger.Launch();
             QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Debug, "Getting JSON");
             IsMore = false;
             String json = "";
             try
             {
                 json = client.DownloadString(ActiveUrl);
+                QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Json was - " + json);
                 ActiveResults = JsonConvert.DeserializeObject(json);
                 //PageActiveUrl();
                 return ActiveResults;
@@ -190,6 +221,7 @@ namespace GenericRestConnector
 
         public void Page()
         {
+            pageInfo.CurrentPage++;
             //at present supplied url paging doesn't fit into the 'generic' paging model
             if (Dictionary.paging_method.ToString() == "Supplied URL")
             {

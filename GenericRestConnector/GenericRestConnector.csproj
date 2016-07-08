@@ -93,6 +93,7 @@
     <Compile Include="ErrorHelper.cs" />
     <Compile Include="Authentication\AuthBase.cs" />
     <Compile Include="Authentication\NoAuth.cs" />
+    <Compile Include="Paging\PagePaging.cs" />
     <Compile Include="Paging\OffsetLimitPaging.cs" />
     <Compile Include="Paging\PageInfo.cs" />
     <Compile Include="Paging\Pager.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />
+    <Compile Include="TableCache.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
