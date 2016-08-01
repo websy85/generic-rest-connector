@@ -181,10 +181,11 @@ namespace GenericRestConnector
                     }
                     else
                     {
-                        helper.pageInfo.CurrentPageSize = Convert.ToInt32(data.Count);
+                        //helper.pageInfo.CurrentPageSize = Convert.ToInt32(data.Count);
                         //helper.pageInfo.CurrentPage++;
                         if (data.GetType().Name == "JArray")
                         {
+                            helper.pageInfo.CurrentPageSize = ((Newtonsoft.Json.Linq.JArray)(data)).Count;
                             foreach (dynamic row in data)
                             {
                                 if (recordsLoaded < helper.pageInfo.LoadLimit)
@@ -200,6 +201,7 @@ namespace GenericRestConnector
                         }
                         else
                         {
+                            helper.pageInfo.CurrentPageSize = Convert.ToInt32(data.Count);
                             if (recordsLoaded < helper.pageInfo.LoadLimit)
                             {
                                 yield return InsertRow(data, qTable, null);
@@ -299,7 +301,7 @@ namespace GenericRestConnector
             try
             {
                 Match match;
-                match = Regex.Match(query, @"(?:select\s(?<fields>[^\/\r\n]*))\s(?:from\s(?<table>[^\/\r\n\s]+))\s*(?:where\s(?<where>[^\/\r\n\s]*))?(?:\s*)(?:limit\s(?<limit>[^\/\r\n\s]*))?(?:\s*)(?<cache>cache)?", RegexOptions.IgnoreCase);
+                match = Regex.Match(query, @"(?:select\s(?<fields>[^\/\r\n]*))\s(?:from\s(?<table>[^\/\r\n\s]+))\s*(?:where\s(?<where>[^\r\n\s]*))?(?:\s*)(?:limit\s(?<limit>[^\/\r\n\s]*))?(?:\s*)(?<cache>cache)?", RegexOptions.IgnoreCase);
                 
                 if (!match.Success)
                 {
