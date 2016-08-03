@@ -259,9 +259,16 @@ namespace GenericRestConnector
                 string[] Children = path.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (String s in Children)
                 {
-                    if (result[s] != null)
+                    if (result.GetType().Name != "JArray")
                     {
-                        result = result[s];
+                        if (result[s] != null)
+                        {
+                            result = result[s];
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                     else
                     {

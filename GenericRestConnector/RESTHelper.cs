@@ -244,9 +244,9 @@ namespace GenericRestConnector
             else
             {
                 ActiveUrl = pager.PrepUrl(UrlBase, Dictionary.base_endpoint.ToString(), ActiveTable.endpoint.ToString(), Where, pageInfo);
-                //add any authentication url stuff
-                ActiveUrl = authentication.PrepUrl(ActiveUrl);
             }
+            //add any authentication url stuff
+            ActiveUrl = authentication.PrepUrl(ActiveUrl);
             if(String.IsNullOrEmpty(ActiveUrl))
             {
                 IsMore = false;
