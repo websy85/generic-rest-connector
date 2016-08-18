@@ -37,10 +37,10 @@ namespace GenericRestConnector
             //Get a reference to the QvxTable from MTables
             QvxTable qTable = FindTable(liveTable, MTables);
             helper.Prep();
-            
+            bool isFromCache = helper.cacheEndpointMap.ContainsKey(helper.ActiveTable.endpoint.ToString());
             while (helper.IsMore)
-            {    
-                if ( helper.cacheEndpointMap.ContainsKey(helper.ActiveTable.endpoint.ToString()))
+            {
+                if (isFromCache)
                 {
                     String cachedTable = helper.cacheEndpointMap[helper.ActiveTable.endpoint.ToString()];
                     if (cachedTable != liveTable)
@@ -147,6 +147,7 @@ namespace GenericRestConnector
                 {
                     if (!String.IsNullOrEmpty(helper.DataElement))
                     {
+                        //Debugger.Launch();
                         List<String> dataElemPath = helper.DataElement.Split(new String[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList();
                         foreach (String elem in dataElemPath)
                         {
@@ -162,7 +163,22 @@ namespace GenericRestConnector
                             List<String> childDataElem = childDataElemParam.Split(new String[] { "." }, StringSplitOptions.RemoveEmptyEntries).ToList();
                             foreach (String elem in childDataElem)
                             {
-                                childData = childData[elem];
+                                if (elem == "*")
+                                {
+                                    try
+                                    {
+                                        childData = ((Newtonsoft.Json.Linq.JProperty)(childData)).Value;
+                                    }
+                                    catch (Exception ex)
+                                    {
+
+                                    }
+                                }
+                                else
+                                {
+                                    childData = childData[elem];
+                                }
+                                
                             }
                             if (childData != null)
                             {
@@ -218,7 +234,15 @@ namespace GenericRestConnector
 
                 
                 helper.pageInfo.CurrentRecord = recordsLoaded;
-                helper.Page();
+                if (isFromCache)
+                {
+                    helper.pageInfo.CurrentPage++;
+                }
+                else
+                {
+                    helper.Page();
+                }
+                
             }
         }
 
@@ -304,7 +328,8 @@ namespace GenericRestConnector
             //NOTE: Where clause not yet supported
             String fields = "";
             String where = "";
-            query = query.Replace("\r\n", " ");
+            Int16 limit;
+            query = query.Replace("\r\n", " ").Replace("\n", " ");
             try
             {
                 Match match;
@@ -320,6 +345,18 @@ namespace GenericRestConnector
                 if(match.Groups["where"]!=null){
                     where = match.Groups["where"].Value;
                     where = where.Trim();
+                }
+                if (match.Groups["limit"] != null)
+                {
+                    try
+                    {
+                        limit = Int16.Parse(match.Groups["limit"].Value);
+                        helper.pageInfo.LoadLimit = limit;
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
                 liveTable = match.Groups["table"].Value;
                 if (match.Groups["cache"].Value.ToLower() == "cache")

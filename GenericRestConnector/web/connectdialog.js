@@ -19,7 +19,7 @@
                     Basic: "/customdata/64/GenericRestConnector/web/basicAuth.ng.html",
                     "OAuth": "/customdata/64/GenericRestConnector/web/oAuth.ng.html",
                     Certificate: "",
-                    "API Key": "/customdata/GenericRestConnector/apiKey.ng.html"
+                    "API Key": "/customdata/64/GenericRestConnector/web/apiKey.ng.html"
                 };
                 $scope.name;
                 $scope.username;

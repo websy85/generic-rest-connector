@@ -120,7 +120,16 @@ namespace GenericRestConnector
         }
 
         public void cacheTable(String tableName, Int32 pageNumber, dynamic data)
-        {
+        {            
+            if (cachedTables.ContainsKey(tableName + pageNumber))
+            {
+                bool validPage = false;
+                while (!validPage)
+                {
+                    pageNumber++;
+                    validPage = !cachedTables.ContainsKey(tableName + pageNumber);
+                }
+            }
             TableCache t = new TableCache(pageNumber, data);
             cachedTables.Add(tableName+pageNumber.ToString(), t);
         }

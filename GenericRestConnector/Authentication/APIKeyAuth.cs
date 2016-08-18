@@ -24,6 +24,7 @@ namespace GenericRestConnector
                 url += "&";
             }
             url += options.api_key_parameter;
+            url += "=";
             url += info.APIKey;
             return url;
         }

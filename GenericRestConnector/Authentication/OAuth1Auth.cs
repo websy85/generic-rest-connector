@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.IO;
 using System.Security.Cryptography;
+using System.Diagnostics;
 
 namespace GenericRestConnector
 {
@@ -73,7 +74,16 @@ namespace GenericRestConnector
             string encodedParams = normalizeParams(httpMethod, url, oauthParams);
 
             // URL-encode the relative URL
-            string encodedUri = Uri.EscapeDataString(url.OriginalString.Replace(url.Query,""));
+            //Debugger.Launch();
+            string encodedUri;
+            if (!String.IsNullOrEmpty(url.Query))
+            {
+                encodedUri = Uri.EscapeDataString(url.OriginalString.Replace(url.Query, ""));
+            }
+            else
+            {
+                encodedUri = Uri.EscapeDataString(url.OriginalString);
+            }
 
             // Build the signature base string to be signed with the Consumer Secret
             string baseString = String.Format("{0}&{1}&{2}", httpMethod, encodedUri, encodedParams);
