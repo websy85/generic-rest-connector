@@ -341,6 +341,7 @@ namespace GenericRestConnector
             //wc.Headers[HttpRequestHeader.ContentType] = "application/json";
             wc.Headers[HttpRequestHeader.Accept] = "application/json";
             wc.Headers[HttpRequestHeader.UserAgent] = "generic-rest-connector";
+            wc.Encoding = System.Text.Encoding.UTF8;
             return wc;
         }
     }
