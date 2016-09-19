@@ -60,6 +60,13 @@ namespace GenericRestConnector
                     QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "End of data (" + liveTable + ")");
                     break;
                 }
+                if (data.GetType().Name == "JArray")
+                {
+                    if(((Newtonsoft.Json.Linq.JArray)(data)).Count==0){
+                        QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "End of data (" + liveTable + ")");
+                        break;
+                    }
+                }
                 if (helper.tableCacheList.IndexOf(liveTable) != -1)
                 {
                     if (!helper.cacheEndpointMap.ContainsKey(helper.ActiveTable.endpoint.ToString()))
@@ -112,11 +119,17 @@ namespace GenericRestConnector
                             }
                             if (dataIsArray)
                             {
+                                if (((Newtonsoft.Json.Linq.JArray)(childData)).Count == 0)
+                                {
+                                    helper.IsMore = false;
+                                    break;
+                                }
                                 foreach (dynamic row in childData)
                                 {
                                     if (recordsLoaded < helper.pageInfo.LoadLimit)
                                     {
                                         yield return InsertRow(row, qTable, child);
+                                        recordsLoaded++;
                                     }
                                     else
                                     {
@@ -157,6 +170,11 @@ namespace GenericRestConnector
                     if (helper.ActiveTable.child_data_element != null && helper.ActiveTable.child_data_element.ToString() != "")
                     {
                         String childDataElemParam = helper.ActiveTable.child_data_element.ToString();
+                        if (((Newtonsoft.Json.Linq.JArray)(data)).Count == 0)
+                        {
+                            helper.IsMore = false;
+                            break;
+                        }
                         foreach (dynamic row in data)
                         {
                             dynamic childData = row;
@@ -193,6 +211,7 @@ namespace GenericRestConnector
                                 helper.IsMore = false;
                                 break;
                             }
+                            recordsLoaded++;
                         }
                     }
                     else
@@ -202,11 +221,17 @@ namespace GenericRestConnector
                         if (data.GetType().Name == "JArray")
                         {
                             helper.pageInfo.CurrentPageSize = ((Newtonsoft.Json.Linq.JArray)(data)).Count;
+                            if (((Newtonsoft.Json.Linq.JArray)(data)).Count == 0)
+                            {
+                                helper.IsMore = false;
+                                break;
+                            }
                             foreach (dynamic row in data)
                             {
                                 if (recordsLoaded < helper.pageInfo.LoadLimit)
                                 {
                                     yield return InsertRow(row, qTable, null);
+                                    recordsLoaded++;
                                 }
                                 else
                                 {
@@ -221,6 +246,7 @@ namespace GenericRestConnector
                             if (recordsLoaded < helper.pageInfo.LoadLimit)
                             {
                                 yield return InsertRow(data, qTable, null);
+                                recordsLoaded++;
                             }
                             else
                             {
@@ -271,7 +297,7 @@ namespace GenericRestConnector
                     sourceField = GetSourceValue(sourceRow, null, originalDef.type.ToString());
                 }
             }
-            recordsLoaded++;
+            //recordsLoaded++;
             return destRow;
         }
 
