@@ -10,7 +10,7 @@ A catalog of online dictionaries is available directly inside the Connector as w
 Both the **Connector** and **Dictionary Factory** are Open Source so feel free to contribute and add new Authentication or Paging capabilites.
 
 ### Installation
-1. Download the zipped Connector [here](https://github.com/websy85/generic-rest-connector/raw/master/Build/GenericRestConnector.zip).
+1. Download the zipped Connector **[here](https://github.com/websy85/generic-rest-connector/raw/master/Build/GenericRestConnector.zip)**.
 2. Extract the contents of the zip file to **C:\Program Files\Common Files\Qlik\Custom Data**.
 3. Restart the Qlik Sense Engine Service (Server) or restart Qlik Sense Desktop.
 4. In the **Load Editor** you should now see a new **Generic REST Connector** option under the **Create New Connection** menu.
