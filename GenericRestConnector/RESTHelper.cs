@@ -39,6 +39,7 @@ namespace GenericRestConnector
         {
             QvxLog.Log(QvxLogFacility.Application, QvxLogSeverity.Notice, "Setting up REST Helper");
             client = new WebClient();
+            client.Encoding = Encoding.UTF8;
 
             String UserName;
             String Password;
