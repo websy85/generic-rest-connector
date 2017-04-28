@@ -34,6 +34,7 @@
                 $scope.dicurl="";
                 $scope.config;
                 $scope.provider = "GenericRestConnector.exe";
+                $scope.idForAuthorization = "";
                 $scope.subpage = $scope.connectionTemplates["None"];
 
                 //if the connection is being modified
@@ -147,11 +148,13 @@
                     if ($scope.source == "online") {
                         $scope.selectedDictionaryInfo = $scope.onlineDictionaryList[index];
                         $scope.dictionaryId = $scope.onlineDictionaryList[index]._id;
+                        $scope.idForAuthorization = $scope.onlineDictionaryList[index]._id;
                     }
                     else {
                         $scope.selectedDictionaryInfo = $scope.localDictionaryList[index];
                         $scope.dictionaryId = $scope.localDictionaryList[index].folder;
                     }
+                    
                 }
                 $scope.dicurl = dicurl;
                 $scope.loadingMessage = "Downloading Dictionary Definition...";
@@ -160,6 +163,9 @@
                     $scope.auth_method = $scope.dictionaryDef.auth_method;
                     $scope.subpage = $scope.connectionTemplates[$scope.dictionaryDef.auth_method];
                     $scope.subpageLoading = false;
+                    if ($scope.source == "local") {
+                        $scope.idForAuthorization = $scope.dictionaryDef.id;
+                    }
                 });
             }
 

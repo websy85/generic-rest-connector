@@ -4,9 +4,8 @@
 
 .qrest-connect-dialog {
 	width: 70%;
-    top: 20%;
     margin: 50px auto;
-    height: calc(100% - 100px);
+    height: calc(100vh - 100px);
     background-color: white;
     position: relative;
     padding-left: 10px;
