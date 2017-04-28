@@ -17,3 +17,13 @@ Y:\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x
 Y:\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\GenericRestConnector.exe
 Y:\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\GenericRestConnector.pdb
 \\psf\Home\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Release\GenericRestConnector.csprojResolveAssemblyReference.cache
+\\Mac\Home\Documents\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Release\GenericRestConnector.exe
+\\Mac\Home\Documents\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Release\GenericRestConnector.pdb
+\\Mac\Home\Documents\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Release\GenericRestConnector.csprojResolveAssemblyReference.cache
+\\Mac\Home\Documents\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Release\GenericRestConnector.Properties.Resources.resources
+\\Mac\Home\Documents\Development\Connectors\generic-rest-connector\GenericRestConnector\obj\x64\Release\GenericRestConnector.csproj.GenerateResource.Cache
+\\Mac\Home\Documents\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\GenericRestConnector.exe.config
+\\Mac\Home\Documents\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\GenericRestConnector.exe
+\\Mac\Home\Documents\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\GenericRestConnector.pdb
+\\Mac\Home\Documents\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\Newtonsoft.Json.dll
+\\Mac\Home\Documents\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\QvxLibrary.dll

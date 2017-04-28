@@ -44,6 +44,7 @@ namespace GenericRestConnector
             String Password;
             String dictionaryUrl;
             String Token;
+            String Secret;
             String consumerSecret;
             String source;
             String dictionaryId;
@@ -55,6 +56,7 @@ namespace GenericRestConnector
             MParameters.TryGetValue("username", out UserName);
             MParameters.TryGetValue("password", out Password);
             MParameters.TryGetValue("token", out Token);
+            MParameters.TryGetValue("secret", out Secret);
             MParameters.TryGetValue("consumer_secret", out consumerSecret);
             MParameters.TryGetValue("url", out UrlBase);
             MParameters.TryGetValue("dictionaryurl", out dictionaryUrl);
@@ -64,6 +66,7 @@ namespace GenericRestConnector
             authInfo.User = UserName;
             authInfo.Password = Password;
             authInfo.oauth2Token = Password;
+            authInfo.oauth2Secret = Secret;
             authInfo.APIKey = Password;
             authInfo.ConsumerSecret = consumerSecret;
             authInfo.oauth1Token = Token;
@@ -110,6 +113,10 @@ namespace GenericRestConnector
                     authMethod = "OAuth1.0";
                 }
                 authentication = new Authentication(authMethod, authInfo, Dictionary.auth_options);
+                if (authMethod == "OAuth" && Dictionary.auth_options.uses_refresh_token.ToString()=="True")
+                {
+                    authInfo.oauth2Token = authentication.GetAccessTokenFromRefreshToken(Dictionary.auth_options.oauth_token_url.ToString(), authInfo);
+                }
                 pager = new Pager(Dictionary.paging_method.ToString(), Dictionary.paging_options);
             }
         }

@@ -48,7 +48,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>Y:\2015\Development\Connectors\generic-rest-connector\GenericRestConnector\bin\x64\Release\</OutputPath>
+    <OutputPath>bin\x64\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -88,6 +88,7 @@
     <Compile Include="Authentication\BasicAuth.cs" />
     <Compile Include="Authentication\OAuth1Auth.cs" />
     <Compile Include="Authentication\OAuthAuth.cs" />
+    <Compile Include="TokenResponse.cs" />
     <Compile Include="Catalog.cs" />
     <Compile Include="Connection.cs" />
     <Compile Include="ErrorHelper.cs" />

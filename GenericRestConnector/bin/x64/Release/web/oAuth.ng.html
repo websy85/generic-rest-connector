@@ -18,11 +18,13 @@
         </div>
         <div ng-if="dictionaryDef.auth_options.auth_version=='2.0'">
             <h4>Enter your Client Id and Secret for the connection and Authorize</h4>
-            <input ng-model="$parent.key" placeholder="Client Id" />
-            <p class="hint">If you already have your access token you don't need to authorize, simply enter it below</p>
-            <a target="_blank" href="{{dictionaryDef.factory_oauth_authorize_url}}/{{dictionaryId}}?clientid={{$parent.key}}" class="primary-button qrest-authorize">Authorize</a>
+            <input ng-model="$parent.username" data-parameter="username" placeholder="Client Id" />
+            <input ng-model="$parent.secret" data-parameter="secret" placeholder="Client Secret" />
+            <p class="hint">If you already have your access token or refresh you don't need to authorize, simply enter it below</p>
+            <a target="_blank" href="{{dictionaryDef.factory_oauth_authorize_url}}/{{dictionaryId}}?clientid={{$parent.username}}" class="primary-button qrest-authorize">Authorize</a>
             <h4>Then enter your Refresh or Access Token</h4>
             <input type="password" ng-model="$parent.password" data-parameter="password" placeholder="Refresh or Access Token" />
+            <p class="hint">If a Refresh Token was provided please use that instead of the Access Token.</p>
         </div>
     </div>   
 </div>

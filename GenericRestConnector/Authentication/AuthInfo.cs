@@ -14,6 +14,7 @@ namespace GenericRestConnector
         public String oauth2Token { get; set; }
         public String oauth1Token { get; set; }
         public String oauth1Secret { get; set; }
+        public String oauth2Secret { get; set; }
         public String ConsumerSecret { get; set; }
         public String APIKey { get; set; }
     }
