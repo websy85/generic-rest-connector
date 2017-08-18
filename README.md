@@ -19,7 +19,7 @@ Both the **Connector** and **Dictionary Factory** are Open Source so feel free t
 ### Online Dictionaries
 The online dictionary list is comprised of dictionaries built and published via the [Dictionary Factory](https://rest-dictionary-factory.herokuapp.com).
 
-#####Dictionary Factory
+##### Dictionary Factory
 ![alt text][factory]
 
 #####Connector Online Catalog
@@ -33,7 +33,7 @@ All published dictionaries and your own private (unpublished) dictionaries can b
 3. Click on the **Local** tab.
 4. Click **Update Local Catalog**.
 
-#####Connector Local Catalog
+##### Connector Local Catalog
 ![alt text][local]
 
 ### WHERE Clauses
