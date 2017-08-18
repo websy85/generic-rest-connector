@@ -22,7 +22,7 @@ The online dictionary list is comprised of dictionaries built and published via 
 ##### Dictionary Factory
 ![alt text][factory]
 
-#####Connector Online Catalog
+##### Connector Online Catalog
 ![alt text][public]
 
 ### Local Dictionaries
